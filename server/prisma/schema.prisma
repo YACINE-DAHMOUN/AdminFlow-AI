@@ -7,3 +7,163 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+// ─── USERS ───────────────────────────────────────
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  plan      Plan     @default(FREE)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  profile      Profile?
+  documents    Document[]
+  deadlines    Deadline[]
+  integrations Integration[]
+
+  @@map("users")
+}
+
+// ─── PROFILES ────────────────────────────────────
+model Profile {
+  id          String  @id @default(uuid())
+  userId      String  @unique @map("user_id")
+  companyName String? @map("company_name")
+  siren       String?
+  taxRegime   String? @map("tax_regime")
+  phone       String?
+  address     String?
+
+  // Relation
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+// ─── DOCUMENTS ───────────────────────────────────
+model Document {
+  id            String         @id @default(uuid())
+  userId        String         @map("user_id")
+  name          String
+  type          DocumentType   @default(OTHER)
+  fileUrl       String         @map("file_url")
+  fileSize      Int?           @map("file_size")
+  mimeType      String?        @map("mime_type")
+  extractedText String?        @map("extracted_text")
+  extractedData Json?          @map("extracted_data")
+  summary       String?
+  status        DocumentStatus @default(PENDING)
+  urgency       Urgency        @default(LOW)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deadlines Deadline[]
+
+  @@map("documents")
+}
+
+// ─── DEADLINES ───────────────────────────────────
+model Deadline {
+  id         String         @id @default(uuid())
+  userId     String         @map("user_id")
+  documentId String?        @map("document_id")
+  title      String
+  description String?
+  dueDate    DateTime       @map("due_date")
+  status     DeadlineStatus @default(PENDING)
+  urgency    Urgency        @default(LOW)
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  document Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+
+  @@map("deadlines")
+}
+
+// ─── INTEGRATIONS ────────────────────────────────
+model Integration {
+  id           String            @id @default(uuid())
+  userId       String            @map("user_id")
+  provider     String
+  accessToken  String?           @map("access_token")
+  refreshToken String?           @map("refresh_token")
+  status       IntegrationStatus @default(ACTIVE)
+  metadata     Json?
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  // Relation
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("integrations")
+}
+
+// ─── AI LOGS ─────────────────────────────────────
+model AiLog {
+  id         String   @id @default(uuid())
+  documentId String   @map("document_id")
+  prompt     String
+  response   String
+  model      String   @default("llama3")
+  duration   Int?
+  success    Boolean  @default(true)
+  error      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("ai_logs")
+}
+
+// ─── ENUMS ───────────────────────────────────────
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Plan {
+  FREE
+  PLUS
+  PRO
+}
+
+enum DocumentType {
+  URSSAF
+  IMPOTS
+  BANQUE
+  CONTRAT
+  FACTURE
+  COURRIER
+  OTHER
+}
+
+enum DocumentStatus {
+  PENDING
+  PROCESSING
+  DONE
+  ERROR
+}
+
+enum DeadlineStatus {
+  PENDING
+  DONE
+  OVERDUE
+  CANCELLED
+}
+
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
