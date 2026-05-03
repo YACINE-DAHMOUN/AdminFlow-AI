@@ -7,8 +7,12 @@ export const registerSchema = z.object({
     .toLowerCase(),
   password: z
     .string()
-    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
-    .max(100, 'Le mot de passe est trop long'),
+    .min(12, 'Le mot de passe doit contenir au moins 12 caractères')
+    .max(100, 'Le mot de passe est trop long')
+    .regex(/[A-Z]/, 'Au moins une lettre majuscule requise')
+    .regex(/[a-z]/, 'Au moins une lettre minuscule requise')
+    .regex(/[0-9]/, 'Au moins un chiffre requis')
+    .regex(/[^A-Za-z0-9]/, 'Au moins un caractère spécial requis'),
 })
 
 export const loginSchema = z.object({
