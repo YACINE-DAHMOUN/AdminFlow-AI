@@ -12,9 +12,11 @@ const registerSchema = z.object({
     .email('Adresse email invalide'),
   password: z
     .string()
-    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
-    .regex(/[A-Z]/, 'Le mot de passe doit contenir au moins une majuscule')
-    .regex(/[0-9]/, 'Le mot de passe doit contenir au moins un chiffre'),
+    .min(12, 'Le mot de passe doit contenir au moins 12 caractères')
+    .regex(/[A-Z]/, 'Au moins une lettre majuscule requise')
+    .regex(/[a-z]/, 'Au moins une lettre minuscule requise')
+    .regex(/[0-9]/, 'Au moins un chiffre requis')
+    .regex(/[^A-Za-z0-9]/, 'Au moins un caractère spécial requis (!@#$%^&*...)'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Les mots de passe ne correspondent pas',
@@ -26,33 +28,69 @@ type RegisterForm = z.infer<typeof registerSchema>
 // Indicateur de force du mot de passe
 function PasswordStrength({ password }: { password: string }) {
   const checks = [
-    { label: '8 caractères minimum', valid: password.length >= 8 },
-    { label: 'Une majuscule', valid: /[A-Z]/.test(password) },
+    { label: '12 caractères minimum', valid: password.length >= 12 },
+    { label: 'Une lettre majuscule', valid: /[A-Z]/.test(password) },
+    { label: 'Une lettre minuscule', valid: /[a-z]/.test(password) },
     { label: 'Un chiffre', valid: /[0-9]/.test(password) },
+    { label: 'Un caractère spécial (!@#$%...)', valid: /[^A-Za-z0-9]/.test(password) },
   ]
 
   if (!password) return null
 
+  const validCount = checks.filter(c => c.valid).length
+  const strength = validCount <= 2 ? 'Faible' : validCount <= 4 ? 'Moyen' : 'Fort'
+  const strengthColor = validCount <= 2 ? '#DC2626' : validCount <= 4 ? '#D97706' : '#16A34A'
+  const strengthWidth = `${(validCount / checks.length) * 100}%`
+
   return (
-    <ul className="mt-2 space-y-1" aria-label="Critères du mot de passe">
-      {checks.map((check) => (
-        <li
-          key={check.label}
-          className={`flex items-center gap-1.5 text-xs ${
-            check.valid ? 'text-[#16A34A]' : 'text-[#94A3B8]'
-          }`}
+    <div className="mt-3" id="password-requirements">
+      {/* Barre de force */}
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-xs text-[#475569]">Force du mot de passe</span>
+        <span
+          className="text-xs font-semibold"
+          style={{ color: strengthColor }}
+          aria-live="polite"
+          aria-label={`Force du mot de passe : ${strength}`}
         >
-          <CheckCircle2
-            className="w-3.5 h-3.5 shrink-0"
-            aria-hidden="true"
-          />
-          <span>{check.label}</span>
-          <span className="sr-only">
-            {check.valid ? '— validé' : '— non validé'}
-          </span>
-        </li>
-      ))}
-    </ul>
+          {strength}
+        </span>
+      </div>
+      <div
+        className="h-1.5 w-full bg-[#E2E8F0] rounded-full overflow-hidden"
+        role="progressbar"
+        aria-valuenow={validCount}
+        aria-valuemin={0}
+        aria-valuemax={checks.length}
+        aria-label="Indicateur de force du mot de passe"
+      >
+        <div
+          className="h-full rounded-full transition-all duration-300"
+          style={{ width: strengthWidth, backgroundColor: strengthColor }}
+        />
+      </div>
+
+      {/* Critères */}
+      <ul className="mt-2.5 space-y-1.5" aria-label="Critères requis pour le mot de passe">
+        {checks.map((check) => (
+          <li
+            key={check.label}
+            className={`flex items-center gap-2 text-xs transition-colors ${
+              check.valid ? 'text-[#16A34A]' : 'text-[#94A3B8]'
+            }`}
+          >
+            <CheckCircle2
+              className="w-3.5 h-3.5 shrink-0"
+              aria-hidden="true"
+            />
+            <span>{check.label}</span>
+            <span className="sr-only">
+              {check.valid ? '— critère validé' : '— critère non validé'}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
@@ -215,7 +253,7 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569] transition-colors p-1 rounded"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569] transition-colors p-1 rounded-full focus:outline-none focus:ring-1 focus:ring-[#1D4ED8] focus:ring-offset-1"
                 >
                   {showPassword
                     ? <EyeOff className="w-4 h-4" aria-hidden="true" />

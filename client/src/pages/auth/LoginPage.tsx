@@ -169,7 +169,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569] transition-colors p-1 rounded"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569] transition-colors p-1 rounded-full focus:outline-none focus:ring-1 focus:ring-[#1D4ED8] focus:ring-offset-1"
                 >
                   {showPassword
                     ? <EyeOff className="w-4 h-4" aria-hidden="true" />
@@ -201,7 +201,7 @@ export default function LoginPage() {
                 rounded-lg transition-colors
                 focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:ring-offset-2
                 disabled:opacity-60 disabled:cursor-not-allowed
-                min-h-[44px]
+                
               "
             >
               {isSubmitting ? (
