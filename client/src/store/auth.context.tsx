@@ -25,34 +25,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Vérifie la session existante au démarrage
+  // Vérifie la session au démarrage via le cookie httpOnly
   useEffect(() => {
-    const initAuth = async () => {
-      const token = authService.getToken()
-      if (!token) {
-        setIsLoading(false)
-        return
-      }
-      try {
-        const currentUser = await authService.getMe()
-        setUser(currentUser)
-      } catch {
-        authService.clearSession()
-      } finally {
-        setIsLoading(false)
-      }
+  const initAuth = async () => {
+    try {
+      const currentUser = await authService.getMe()
+      setUser(currentUser)
+    } catch {
+      // 401 = pas de session active — c'est normal au démarrage
+      setUser(null)
+    } finally {
+      setIsLoading(false)
     }
-    initAuth()
-  }, [])
+  }
+  initAuth()
+}, [])
 
   const login = useCallback(async (data: LoginDto) => {
-    const response = await authService.login(data)
-    setUser(response.data.user)
+    const result = await authService.login(data)
+    setUser(result.user)
   }, [])
 
   const register = useCallback(async (data: RegisterDto) => {
-    const response = await authService.register(data)
-    setUser(response.data.user)
+    const result = await authService.register(data)
+    setUser(result.user)
   }, [])
 
   const logout = useCallback(async () => {
@@ -82,7 +78,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
-// Hook personnalisé — usage : const { user, login } = useAuth()
 export function useAuth() {
   const context = useContext(AuthContext)
   if (!context) {
