@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import cookieParser from 'cookie-parser'
 
 // Routes
 import authRoutes from './modules/auth/routes/auth.routes'
@@ -10,10 +11,17 @@ const app = express()
 
 // Middlewares globaux
 app.use(helmet())
-app.use(cors({ origin: 'http://localhost:5173' }))
+
+// CORS — authorise les cookies cross-origin depuis le frontend
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,    // OBLIGATOIRE pour les cookies
+}))
+
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())  // Parse les cookies de chaque requête
 
 // Health check
 app.get('/health', (req, res) => {
@@ -23,7 +31,7 @@ app.get('/health', (req, res) => {
 // Routes API
 app.use('/api/auth', authRoutes)
 
-// Middleware 404
+// 404
 app.use((req, res) => {
   res.status(404).json({
     success: false,

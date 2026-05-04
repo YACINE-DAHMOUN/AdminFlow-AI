@@ -13,9 +13,13 @@ export const authMiddleware = (
   next: NextFunction
 ): void => {
   try {
-    const authHeader = req.headers.authorization
+    // Lire le token depuis le cookie httpOnly EN PRIORITÉ
+    // Fallback sur le header Authorization pour les tests API
+    const tokenFromCookie = req.cookies?.adminflow_token
+    const tokenFromHeader = req.headers.authorization?.split(' ')[1]
+    const token = tokenFromCookie || tokenFromHeader
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       res.status(401).json({
         success: false,
         message: 'Token manquant — authentification requise',
@@ -23,12 +27,8 @@ export const authMiddleware = (
       return
     }
 
-    const token = authHeader.split(' ')[1]
-
     const decoded = jwt.verify(token, config.jwtSecret) as JwtPayload
-
     req.user = decoded
-
     next()
   } catch (error) {
     res.status(401).json({

@@ -2,19 +2,35 @@ import type { Request, Response } from 'express'
 import { authService } from '../services/auth.service'
 import { registerSchema, loginSchema } from '../validators/auth.validators'
 
+// Durée du cookie — 7 jours en millisecondes
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000
+
+// Options du cookie sécurisé
+const cookieOptions = {
+  httpOnly: true,        // Inaccessible par JavaScript
+  secure: process.env.NODE_ENV === 'production', // HTTPS uniquement en prod
+  sameSite: 'lax' as const,  // Protection CSRF
+  maxAge: COOKIE_MAX_AGE,
+  path: '/',
+}
+
 export class AuthController {
 
   async register(req: Request, res: Response): Promise<void> {
     try {
-      // Valider les données entrantes
       const validatedData = registerSchema.parse(req.body)
-
       const result = await authService.register(validatedData)
+
+      // Envoyer le token en cookie httpOnly
+      res.cookie('adminflow_token', result.token, cookieOptions)
 
       res.status(201).json({
         success: true,
         message: 'Compte créé avec succès',
-        data: result,
+        data: {
+          user: result.user
+          // On ne renvoie PLUS le token dans le body
+        },
       })
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -35,13 +51,18 @@ export class AuthController {
   async login(req: Request, res: Response): Promise<void> {
     try {
       const validatedData = loginSchema.parse(req.body)
-
       const result = await authService.login(validatedData)
+
+      // Envoyer le token en cookie httpOnly
+      res.cookie('adminflow_token', result.token, cookieOptions)
 
       res.status(200).json({
         success: true,
         message: 'Connexion réussie',
-        data: result,
+        data: {
+          user: result.user
+          // On ne renvoie PLUS le token dans le body
+        },
       })
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -60,8 +81,14 @@ export class AuthController {
   }
 
   async logout(req: Request, res: Response): Promise<void> {
-    // Avec JWT stateless, la déconnexion est gérée côté client
-    // Le client supprime simplement le token de son stockage
+    // Supprimer le cookie en lui donnant une date d'expiration passée
+    res.clearCookie('adminflow_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/',
+    })
+
     res.status(200).json({
       success: true,
       message: 'Déconnexion réussie',
