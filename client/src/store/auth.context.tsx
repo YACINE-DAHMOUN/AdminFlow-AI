@@ -25,21 +25,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Vérifie la session au démarrage via le cookie httpOnly
   useEffect(() => {
-  const initAuth = async () => {
-    try {
-      const currentUser = await authService.getMe()
-      setUser(currentUser)
-    } catch {
-      // 401 = pas de session active — c'est normal au démarrage
-      setUser(null)
-    } finally {
-      setIsLoading(false)
+    const initAuth = async () => {
+      try {
+        const currentUser = await authService.getMe()
+        setUser(currentUser)
+      } catch {
+        setUser(null)
+      } finally {
+        setIsLoading(false)
+      }
     }
-  }
-  initAuth()
-}, [])
+    initAuth()
+  }, [])
 
   const login = useCallback(async (data: LoginDto) => {
     const result = await authService.login(data)

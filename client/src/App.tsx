@@ -5,21 +5,18 @@ import {
   createRootRoute,
   Outlet,
 } from '@tanstack/react-router'
-import { AuthProvider } from './store/auth.context'
-import { useAuth } from './store/auth.context'
+import { AuthProvider, useAuth } from './store/auth.context'
 import ProtectedRoute from './components/shared/ProtectedRoute'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
+import UploadPage from './pages/documents/UploadPage'
+import DocumentsPage from './pages/documents/DocumentsPage'
 
-// ─── LAYOUTS ──────────────────────────────────────────
-
-// Layout racine — wrap toute l'app
 function RootLayout() {
   return <Outlet />
 }
 
-// Layout protégé — vérifie l'auth avant d'afficher
 function AuthLayout() {
   return (
     <ProtectedRoute>
@@ -28,13 +25,8 @@ function AuthLayout() {
   )
 }
 
-// ─── ROUTES ───────────────────────────────────────────
+const rootRoute = createRootRoute({ component: RootLayout })
 
-const rootRoute = createRootRoute({
-  component: RootLayout,
-})
-
-// Route index — redirige selon l'état d'auth
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
@@ -50,7 +42,6 @@ const indexRoute = createRoute({
   },
 })
 
-// Routes publiques
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
@@ -63,28 +54,39 @@ const registerRoute = createRoute({
   component: RegisterPage,
 })
 
-// Layout protégé
 const protectedLayout = createRoute({
   getParentRoute: () => rootRoute,
   id: 'protected',
   component: AuthLayout,
 })
 
-// Routes protégées
 const dashboardRoute = createRoute({
   getParentRoute: () => protectedLayout,
   path: '/dashboard',
   component: DashboardPage,
 })
 
-// ─── ROUTER ───────────────────────────────────────────
+const uploadRoute = createRoute({
+  getParentRoute: () => protectedLayout,
+  path: '/upload',
+  component: UploadPage,
+})
 
+const documentsRoute = createRoute({
+  getParentRoute: () => protectedLayout,
+  path: '/documents',
+  component: DocumentsPage,
+})
+
+// ─── ROUTER — construit APRÈS toutes les routes ───────
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   registerRoute,
   protectedLayout.addChildren([
     dashboardRoute,
+    uploadRoute,
+    documentsRoute,
   ]),
 ])
 
@@ -98,8 +100,6 @@ declare module '@tanstack/react-router' {
     router: typeof router
   }
 }
-
-// ─── APP ──────────────────────────────────────────────
 
 export default function App() {
   return (
