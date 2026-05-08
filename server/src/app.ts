@@ -3,6 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
+import documentRoutes from './modules/documents/routes/document.routes'
 
 // Routes
 import authRoutes from './modules/auth/routes/auth.routes'
@@ -30,6 +31,7 @@ app.get('/health', (req, res) => {
 
 // Routes API
 app.use('/api/auth', authRoutes)
+app.use('/api/documents', documentRoutes)
 
 // 404
 app.use((req, res) => {
