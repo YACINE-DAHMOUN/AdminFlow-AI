@@ -1,6 +1,7 @@
 import { prisma } from '../../../core/config/prisma'
 import { storageService } from '../../../services/storage/storage.service'
 import { ocrService } from '../../../services/ocr/ocr.service'
+import { aiService } from '../../../services/ai/ai.service'
 import type { CreateDocumentDto } from '../../../types/document.types'
 
 export const documentService = {
@@ -31,7 +32,7 @@ export const documentService = {
       })
       documentId = document.id
 
-      // Étape 3 — OCR : extraire le texte
+      // Étape 3 — OCR
       console.log('🔍 Extraction OCR en cours...')
       await prisma.document.update({
         where: { id: documentId },
@@ -43,34 +44,51 @@ export const documentService = {
         file.mimetype
       )
 
-      // Étape 4 — Mettre à jour avec le texte extrait
-      const updatedDocument = await prisma.document.update({
+      // Étape 4 — Mise à jour avec le texte extrait
+      await prisma.document.update({
         where: { id: documentId },
-        data: {
-          extractedText,
-          status: 'DONE',
-        },
+        data: { extractedText },
+      })
+
+      // Étape 5 — Analyse IA
+      console.log('🤖 Analyse IA en cours...')
+      const analysis = await aiService.analyzeDocument(
+        documentId,
+        extractedText
+      )
+        console.log('AI ANALYSIS =>', analysis) 
+      // Étape 6 — Créer les échéances détectées automatiquement
+      if (analysis.dates && analysis.dates.length > 0) {
+        console.log('📅 Création des échéances détectées...')
+        await createDeadlinesFromAnalysis(
+          userId,
+          documentId,
+          analysis
+        )
+      }
+
+      // Étape 7 — Récupérer le document final mis à jour
+      const finalDocument = await prisma.document.findUnique({
+        where: { id: documentId },
       })
 
       console.log('✅ Document traité avec succès')
-      return updatedDocument
+      return finalDocument
 
     } catch (error: any) {
-      // En cas d'erreur — mettre à jour le statut ERROR
       if (documentId) {
         await prisma.document.update({
           where: { id: documentId },
           data: { status: 'ERROR' },
-        }).catch(() => {}) // Ignorer si la mise à jour échoue aussi
+        }).catch(() => {})
       }
 
-      // Si l'upload a réussi mais l'OCR a planté — supprimer le fichier
       if (fileUrl && !documentId) {
         await storageService.deleteFile(fileUrl).catch(() => {})
       }
 
-      throw new Error(error.message || 'Erreur lors du traitement du document')
-    }
+      console.error('FULL ERROR =>', error)
+      throw error    }
   },
 
   async getUserDocuments(userId: string) {
@@ -96,11 +114,7 @@ export const documentService = {
     const document = await prisma.document.findFirst({
       where: { id, userId },
     })
-
-    if (!document) {
-      throw new Error('Document introuvable')
-    }
-
+    if (!document) throw new Error('Document introuvable')
     return document
   },
 
@@ -108,15 +122,53 @@ export const documentService = {
     const document = await prisma.document.findFirst({
       where: { id, userId },
     })
-
-    if (!document) {
-      throw new Error('Document introuvable')
-    }
-
-    // Supprimer le fichier du Storage
+    if (!document) throw new Error('Document introuvable')
     await storageService.deleteFile(document.fileUrl)
-
-    // Supprimer le document de la DB
     await prisma.document.delete({ where: { id } })
   },
+}
+
+// ─── HELPER — Créer les échéances depuis l'analyse IA ─
+
+async function createDeadlinesFromAnalysis(
+  userId: string,
+  documentId: string,
+  analysis: any
+) {
+  const deadlineDates = analysis.dates.filter(
+    (d: any) => d.type === 'DEADLINE' || d.type === 'FIN'
+  )
+
+  for (const dateInfo of deadlineDates) {
+    if (!dateInfo.date || dateInfo.date === 'null') continue
+
+    try {
+      // Parser la date au format JJ/MM/AAAA
+      const parts = dateInfo.date.split('/')
+      if (parts.length !== 3) continue
+
+      const dueDate = new Date(
+        parseInt(parts[2]),
+        parseInt(parts[1]) - 1,
+        parseInt(parts[0])
+      )
+
+      if (isNaN(dueDate.getTime())) continue
+
+      await prisma.deadline.create({
+        data: {
+          userId,
+          documentId,
+          title: dateInfo.label || 'Échéance détectée',
+          dueDate,
+          status: 'PENDING',
+          urgency: analysis.urgency || 'LOW',
+        },
+      })
+
+      console.log(`📅 Échéance créée : ${dateInfo.label} — ${dateInfo.date}`)
+    } catch {
+      console.log(`⚠️ Impossible de créer l'échéance : ${dateInfo.date}`)
+    }
+  }
 }

@@ -8,26 +8,22 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ─── USERS ───────────────────────────────────────
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  plan      Plan     @default(FREE)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  profile      Profile?
-  documents    Document[]
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  role         Role          @default(USER)
+  plan         Plan          @default(FREE)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
   deadlines    Deadline[]
+  documents    Document[]
   integrations Integration[]
+  profile      Profile?
 
   @@map("users")
 }
 
-// ─── PROFILES ────────────────────────────────────
 model Profile {
   id          String  @id @default(uuid())
   userId      String  @unique @map("user_id")
@@ -36,14 +32,11 @@ model Profile {
   taxRegime   String? @map("tax_regime")
   phone       String?
   address     String?
-
-  // Relation
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
 }
 
-// ─── DOCUMENTS ───────────────────────────────────
 model Document {
   id            String         @id @default(uuid())
   userId        String         @map("user_id")
@@ -59,35 +52,29 @@ model Document {
   urgency       Urgency        @default(LOW)
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
-
-  // Relations
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  deadlines Deadline[]
+  deadlines     Deadline[]
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("documents")
 }
 
-// ─── DEADLINES ───────────────────────────────────
 model Deadline {
-  id         String         @id @default(uuid())
-  userId     String         @map("user_id")
-  documentId String?        @map("document_id")
-  title      String
+  id          String         @id @default(uuid())
+  userId      String         @map("user_id")
+  documentId  String?        @map("document_id")
+  title       String
   description String?
-  dueDate    DateTime       @map("due_date")
-  status     DeadlineStatus @default(PENDING)
-  urgency    Urgency        @default(LOW)
-  createdAt  DateTime       @default(now()) @map("created_at")
-  updatedAt  DateTime       @updatedAt @map("updated_at")
-
-  // Relations
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  document Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  dueDate     DateTime       @map("due_date")
+  status      DeadlineStatus @default(PENDING)
+  urgency     Urgency        @default(LOW)
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  document    Document?      @relation(fields: [documentId], references: [id])
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("deadlines")
 }
 
-// ─── INTEGRATIONS ────────────────────────────────
 model Integration {
   id           String            @id @default(uuid())
   userId       String            @map("user_id")
@@ -98,14 +85,11 @@ model Integration {
   metadata     Json?
   createdAt    DateTime          @default(now()) @map("created_at")
   updatedAt    DateTime          @updatedAt @map("updated_at")
-
-  // Relation
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("integrations")
 }
 
-// ─── AI LOGS ─────────────────────────────────────
 model AiLog {
   id         String   @id @default(uuid())
   documentId String   @map("document_id")
@@ -120,7 +104,6 @@ model AiLog {
   @@map("ai_logs")
 }
 
-// ─── ENUMS ───────────────────────────────────────
 enum Role {
   USER
   ADMIN

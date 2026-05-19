@@ -23,6 +23,7 @@ export const documentController = {
         data: document,
       })
     } catch (error: any) {
+      console.error('Error in documentController.upload:', error)
       res.status(500).json({
         success: false,
         message: error.message || 'Erreur lors de l\'upload',
