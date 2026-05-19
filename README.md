@@ -198,18 +198,17 @@ RègleImplémentationFocus visibleOutline 2px bleu sur tous les éléments inter
 Monétisation
 PlanPrixDocuments/moisStockageFREEGratuit5100 MBPLUSÀ définir501 GBPROÀ définirIllimité10 GB
 
-Roadmap
+## Roadmap
 
- Phase 1 — Architecture & Setup
- Phase 2 — Base de données & Authentification (backend + frontend terminés)
- Phase 3 — Upload + OCR
- Phase 4 — Pipeline IA (Ollama + Llama 3)
- Phase 5 — Détection et gestion des échéances
- Phase 6 — UI complète
- Phase 7 — Dashboard Administrateur
- Phase 8 — Intégrations externes
- Phase 9 — Optimisation & Déploiement
-
+- [x] Phase 1 — Architecture & Setup
+- [x] Phase 2 — Base de données & Authentification *(backend + frontend terminés)*
+- [x] Phase 3 — Upload + OCR *(pdfjs-dist + Tesseract.js + Supabase Storage)*
+- [x] Phase 4 — Pipeline IA *(Ollama + Llama 3 — analyse URSSAF validée)*
+- [ ] Phase 5 — Détection et gestion des échéances
+- [ ] Phase 6 — UI complète
+- [ ] Phase 7 — Dashboard Administrateur
+- [ ] Phase 8 — Intégrations externes
+- [ ] Phase 9 — Optimisation & Déploiement
 
 Contribuer
 bash# Créer une branche feature depuis dev
