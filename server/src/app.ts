@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
 import documentRoutes from './modules/documents/routes/document.routes'
+import deadlineRoutes from './modules/deadlines/routes/deadline.routes'
 
 // Routes
 import authRoutes from './modules/auth/routes/auth.routes'
@@ -32,6 +33,8 @@ app.get('/health', (req, res) => {
 // Routes API
 app.use('/api/auth', authRoutes)
 app.use('/api/documents', documentRoutes)
+app.use('/api/deadlines', deadlineRoutes )
+
 
 // 404
 app.use((req, res) => {
@@ -40,5 +43,6 @@ app.use((req, res) => {
     message: `Route ${req.method} ${req.url} introuvable`,
   })
 })
+
 
 export default app

@@ -70,6 +70,7 @@ model Deadline {
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @updatedAt @map("updated_at")
   document    Document?      @relation(fields: [documentId], references: [id])
+  type        DeadlineType   @default(OTHER)
   user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("deadlines")
@@ -134,9 +135,18 @@ enum DocumentStatus {
 
 enum DeadlineStatus {
   PENDING
+  URGENT
   DONE
   OVERDUE
   CANCELLED
+}
+enum DeadlineType {
+  URSSAF
+  IMPOTS
+  BANQUE
+  FACTURE
+  COURRIER
+  OTHER
 }
 
 enum Urgency {
