@@ -1,17 +1,17 @@
 import { prisma } from '../../../core/config/prisma'
 import type { CreateDeadlineDto, UpdateDeadlineDto } from '../validators/deadline.validators'
-
+import { computeDeadlineStatus } from '../utils/deadline-status'
 
 export const deadlineService = {
 
-    async getAll (userId: string) {
+    async getAll(userId: string) {
         return await prisma.deadline.findMany({
             where: { userId },
             orderBy: { dueDate: 'asc' },
         })
     },
 
-    async getById (id: string, userId: string) {
+    async getById(id: string, userId: string) {
         const deadline = await prisma.deadline.findFirst({
             where: { id, userId },
         })
@@ -19,7 +19,7 @@ export const deadlineService = {
         return deadline
     },
 
-    async create (userId: string , dto: CreateDeadlineDto) {
+    async create(userId: string, dto: CreateDeadlineDto) {
         return await prisma.deadline.create({
             data: {
                 userId,
@@ -28,39 +28,45 @@ export const deadlineService = {
                 dueDate: new Date(dto.dueDate),
                 type: dto.type,
                 documentId: dto.documentId || null,
+                status: computeDeadlineStatus(new Date(dto.dueDate)),
             },
         })
     },
     async update(id: string, userId: string, dto: UpdateDeadlineDto) {
-    const deadline = await prisma.deadline.findFirst({
-        where: { id, userId },
-    })
-    if (!deadline) throw new Error('Deadline introuvable')
-    return prisma.deadline.update({
-        where: { id },
-       data: {
-        ...(dto.title && { title: dto.title }),
-        ...(dto.description !== undefined && { description: dto.description }),
-        ...(dto.dueDate && { dueDate: new Date(dto.dueDate) }),
-        ...(dto.type && { type: dto.type }),
-        ...(dto.documentId !== undefined && { documentId: dto.documentId }),
-        },
-    })
+        const deadline = await prisma.deadline.findFirst({
+            where: { id, userId },
+        })
+        if (!deadline) throw new Error('Deadline introuvable')
+        return prisma.deadline.update({
+            where: { id },
+            data: {
+                ...(dto.title && { title: dto.title }),
+                ...(dto.description !== undefined && { description: dto.description }),
+                ...(dto.dueDate && { dueDate: new Date(dto.dueDate) }),
+                ...(dto.type && { type: dto.type }),
+                ...(dto.documentId !== undefined && { documentId: dto.documentId }),
+                // Recalcul du statut si la date change, sauf pour une échéance déjà traitée ou annulée
+                ...(dto.dueDate && !['DONE', 'CANCELLED'].includes(deadline.status) && {
+                    status: computeDeadlineStatus(new Date(dto.dueDate)),
+                })
+            },
+        })
     },
 
-    async markAsDone (id: string, userId: string) {
+    async markAsDone(id: string, userId: string) {
 
         const deadline = await prisma.deadline.findFirst({
-            where: { id, userId } })
-            if (!deadline) throw new Error('Deadline introuvable')
-            return prisma.deadline.update({
-                where: { id },
-                data: { status: 'DONE' },
-            })
-        },
-   
+            where: { id, userId }
+        })
+        if (!deadline) throw new Error('Deadline introuvable')
+        return prisma.deadline.update({
+            where: { id },
+            data: { status: 'DONE' },
+        })
+    },
 
-    async delete (id: string, userId: string) {
+
+    async delete(id: string, userId: string) {
         const deadline = await prisma.deadline.findFirst({
             where: { id, userId },
         })
