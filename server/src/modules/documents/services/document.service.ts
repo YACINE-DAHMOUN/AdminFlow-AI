@@ -3,6 +3,8 @@ import { storageService } from '../../../services/storage/storage.service'
 import { ocrService } from '../../../services/ocr/ocr.service'
 import { aiService } from '../../../services/ai/ai.service'
 import type { CreateDocumentDto } from '../../../types/document.types'
+import { computeDeadlineStatus } from '../../deadlines/utils/deadline-status'
+
 
 export const documentService = {
 
@@ -161,7 +163,7 @@ async function createDeadlinesFromAnalysis(
           documentId,
           title: dateInfo.label || 'Échéance détectée',
           dueDate,
-          status: 'PENDING',
+          status: computeDeadlineStatus(dueDate),
           urgency: analysis.urgency || 'LOW',
         },
       })
