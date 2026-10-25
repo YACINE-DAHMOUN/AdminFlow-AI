@@ -4,7 +4,7 @@ export const createDeadlineSchema = z.object({
 
     title: z.string().min(1, 'Le titre est requis'),
     description: z.string().optional(),
-    dueDate: z.string().refine((d) => !isNaN(Date.parse(d)), {
+    dueDate: z.string({error: 'la date est requise'}).refine((d) => !isNaN(Date.parse(d)), {
     message: 'Date invalide',
     }),
     type: z.enum([ 'URSSAF', 'IMPOTS','BANQUE','FACTURE','COURRIER', 'OTHER'], {  message: 'Type de deadline invalide'}),

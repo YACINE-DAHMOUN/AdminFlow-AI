@@ -37,7 +37,7 @@ export class AuthController {
         res.status(400).json({
           success: false,
           message: 'Données invalides',
-          errors: error.errors,
+          errors: error.issues,
         })
         return
       }
@@ -69,7 +69,7 @@ export class AuthController {
         res.status(400).json({
           success: false,
           message: 'Données invalides',
-          errors: error.errors,
+          errors: error.issues,
         })
         return
       }
