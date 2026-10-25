@@ -138,12 +138,14 @@ export default function LoginPage() {
                   Mot de passe
                   <span aria-hidden="true" className="text-[#DC2626] ml-1">*</span>
                 </label>
-                <Link
-                  to="/forgot-password"
-                  className="text-xs text-[#1D4ED8] hover:text-[#1E40AF] hover:underline"
-                >
-                  Mot de passe oublié ?
-                </Link>
+                {/* TODO : réactiver quand la route /forgot-password existera (envoi d'email via Resend)
+                    <Link
+                      to="/forgot-password"
+                      ...
+                    >
+                      Mot de passe oublié ?
+                    </Link>
+                    */}
               </div>
               <div className="relative">
                 <input
