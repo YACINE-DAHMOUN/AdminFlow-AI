@@ -36,7 +36,8 @@ export const deadlinesController = {
             const updatedDeadline = await deadlineService.update(req.params.id, req.user!.userId, req.body)
             res.json(updatedDeadline)
         } catch (err: any) {
-            res.status(400).json({ message: err.message })
+            const status = err.message === 'Deadline introuvable' ? 404 : 400
+            res.status(status).json({ message: err.message })
         }
     },
 
@@ -45,7 +46,8 @@ export const deadlinesController = {
             const updatedDeadline = await deadlineService.markAsDone(req.params.id, req.user!.userId)
             res.json(updatedDeadline)
         } catch (err: any) {
-            res.status(500).json({ message: err.message })
+            const status = err.message === 'Deadline introuvable' ? 404 : 500
+            res.status(status).json({ message: err.message })
         }
     },
 
