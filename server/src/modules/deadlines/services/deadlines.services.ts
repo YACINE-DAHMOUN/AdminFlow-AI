@@ -32,9 +32,13 @@ export const deadlineService = {
         })
     },
     async update(id: string, userId: string, dto: UpdateDeadlineDto) {
-    return await prisma.deadline.updateMany({
+    const deadline = await prisma.deadline.findFirst({
         where: { id, userId },
-        data: {
+    })
+    if (!deadline) throw new Error('Deadline introuvable')
+    return prisma.deadline.update({
+        where: { id },
+       data: {
         ...(dto.title && { title: dto.title }),
         ...(dto.description !== undefined && { description: dto.description }),
         ...(dto.dueDate && { dueDate: new Date(dto.dueDate) }),
@@ -57,8 +61,10 @@ export const deadlineService = {
    
 
     async delete (id: string, userId: string) {
-        return await prisma.deadline.deleteMany({
+        const deadline = await prisma.deadline.findFirst({
             where: { id, userId },
         })
+        if (!deadline) throw new Error('Deadline introuvable')
+        return prisma.deadline.delete({ where: { id } })
     }
 }   
