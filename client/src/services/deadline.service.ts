@@ -1,6 +1,5 @@
-import api from '../../services/api'
-import type { Deadline } from '../../types/deadline.types'
-
+import api from './api'
+import type { Deadline } from '../types/deadline.types'
 
 
 // L'API des échéances renvoie les objets directement (pas d'enveloppe { success, data })
