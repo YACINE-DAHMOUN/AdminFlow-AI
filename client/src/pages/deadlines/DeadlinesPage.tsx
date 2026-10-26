@@ -3,6 +3,7 @@ import { AlertCircle, CalendarClock, Loader2 } from 'lucide-react'
 import { PageHeading } from '../../components/shared/PageHeading'
 import { deadlineService } from '../../services/deadline.service'
 import type { Deadline } from '../../types/deadline.types'
+import {StatusBadge} from "../../components/shared/StatusBadge";
 
 // Libellés lisibles pour les types d'échéance
 const TYPE_LABELS: Record<Deadline['type'], string> = {
@@ -91,10 +92,7 @@ export default function DeadlinesPage() {
                   {formatDate(deadline.dueDate)} · {TYPE_LABELS[deadline.type]}
                 </p>
               </div>
-              {/* Étape 3 : remplacer par un badge coloré */}
-              <span className="text-xs font-medium text-muted-foreground shrink-0">
-                {deadline.status}
-              </span>
+              <StatusBadge status={deadline.status} />
             </li>
           ))}
         </ul>
