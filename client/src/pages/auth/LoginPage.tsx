@@ -3,7 +3,7 @@ import { useNavigate, Link } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { AlertCircle, Eye, EyeOff, FileText, Loader2 } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, Sparkles, Loader2 } from 'lucide-react'
 import { useAuth } from '../../store/auth.context'
 
 const loginSchema = z.object({
@@ -40,7 +40,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center">
+    <div className="min-h-screen bg-background flex flex-col justify-center">
 
       {/* Skip link accessibilité */}
       <a href="#main-content" className="skip-link">
@@ -51,16 +51,13 @@ export default function LoginPage() {
 
         {/* Logo + Titre */}
         <div className="text-center mb-8">
-          <div
-            className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#1D4ED8] mb-4"
-            aria-hidden="true"
-          >
-            <FileText className="w-6 h-6 text-white" />
+          <div className="inline-flex items-center justify-center size-12 rounded-xl bg-sidebar-primary mb-4" aria-hidden="true">
+                <Sparkles className="size-6 text-sidebar-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">
+          <h1 className="text-2xl font-semibold text-foreground font-heading">
             Connexion
           </h1>
-          <p className="mt-1 text-sm text-[#475569]">
+          <p className="mt-1 text-sm text-muted-foreground">
             Accédez à votre espace AdminFlow AI
           </p>
         </div>
@@ -68,7 +65,7 @@ export default function LoginPage() {
         {/* Carte formulaire */}
         <main
           id="main-content"
-          className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-8"
+          className="bg-card rounded-xl border border-border-border shadow-sm p-8"
         >
 
           {/* Erreur serveur */}
@@ -76,13 +73,13 @@ export default function LoginPage() {
             <div
               role="alert"
               aria-live="polite"
-              className="flex items-start gap-3 p-4 mb-6 bg-[#FEF2F2] border border-[#FECACA] rounded-lg"
+              className="flex items-start gap-3 p-4 mb-6 bg-destructive/10 border-border-destructive/20 rounded-lg"
             >
               <AlertCircle
-                className="w-5 h-5 text-[#DC2626] mt-0.5 shrink-0"
+                className="w-5 h-5 text-destructive mt-0.5 shrink-0"
                 aria-hidden="true"
               />
-              <p className="text-sm text-[#DC2626] font-medium">
+              <p className="text-sm text-destructive font-medium">
                 {serverError}
               </p>
             </div>
@@ -96,9 +93,9 @@ export default function LoginPage() {
 
             {/* Champ Email */}
             <div className="mb-5">
-              <label htmlFor="email" className="block text-sm font-medium text-[#0F172A] mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
                 Adresse email
-                <span aria-hidden="true" className="text-[#DC2626] ml-1">*</span>
+                <span aria-hidden="true" className="text-destructive ml-1">*</span>
               </label>
               <input
                 id="email"
@@ -110,11 +107,11 @@ export default function LoginPage() {
                 aria-describedby={errors.email ? 'email-error' : undefined}
                 className={`
                   w-full px-3.5 py-2.5 text-sm rounded-lg border transition-colors
-                  bg-white text-[#0F172A] placeholder:text-[#94A3B8]
-                  focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:ring-offset-0
+                  bg-card text-foreground placeholder:text-muted-foreground
+                  focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0
                   ${errors.email
-                    ? 'border-[#DC2626] focus:ring-[#DC2626]'
-                    : 'border-[#CBD5E1] hover:border-[#94A3B8]'
+                    ? 'border-destructive focus:ring-destructive'
+                    : 'border-border hover:border-muted-foreground'
                   }
                 `}
                 {...register('email')}
@@ -123,7 +120,7 @@ export default function LoginPage() {
                 <p
                   id="email-error"
                   role="alert"
-                  className="flex items-center gap-1.5 mt-1.5 text-xs text-[#DC2626] font-medium"
+                  className="flex items-center gap-1.5 mt-1.5 text-xs text-destructive font-medium"
                 >
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                   {errors.email.message}
@@ -134,9 +131,9 @@ export default function LoginPage() {
             {/* Champ Mot de passe */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="password" className="block text-sm font-medium text-[#0F172A]">
+                <label htmlFor="password" className="block text-sm font-medium text-foreground">
                   Mot de passe
-                  <span aria-hidden="true" className="text-[#DC2626] ml-1">*</span>
+                  <span aria-hidden="true" className="text-destructive ml-1">*</span>
                 </label>
                 {/* TODO : réactiver quand la route /forgot-password existera (envoi d'email via Resend)
                     <Link
@@ -157,12 +154,12 @@ export default function LoginPage() {
                   aria-invalid={errors.password ? 'true' : 'false'}
                   aria-describedby={errors.password ? 'password-error' : undefined}
                   className={`
-                    w-full px-3.5 py-2.5 pr-11 text-sm rounded-lg border transition-colors
-                    bg-white text-[#0F172A] placeholder:text-[#94A3B8]
-                    focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:ring-offset-0
+                    w-full px-3.5 py-2.5 pr-12 text-sm rounded-lg border transition-colors
+                    bg-card text-foreground placeholder:text-muted-foreground
+                    focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0
                     ${errors.password
-                      ? 'border-[#DC2626] focus:ring-[#DC2626]'
-                      : 'border-[#CBD5E1] hover:border-[#94A3B8]'
+                      ? 'border-destructive focus:ring-destructive'
+                      : 'border-border hover:border-muted-foreground'
                     }
                   `}
                   {...register('password')}
@@ -171,8 +168,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569] transition-colors p-1 rounded-full focus:outline-none focus:ring-1 focus:ring-[#1D4ED8] focus:ring-offset-1"
-                >
+                  className="absolute right-0 top-1/2 -translate-y-1/2 inline-flex size-11 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring"                >
                   {showPassword
                     ? <EyeOff className="w-4 h-4" aria-hidden="true" />
                     : <Eye className="w-4 h-4" aria-hidden="true" />
@@ -183,7 +179,7 @@ export default function LoginPage() {
                 <p
                   id="password-error"
                   role="alert"
-                  className="flex items-center gap-1.5 mt-1.5 text-xs text-[#DC2626] font-medium"
+                  className="flex items-center gap-1.5 mt-1.5 text-xs text-destructive font-medium"
                 >
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                   {errors.password.message}
@@ -198,11 +194,11 @@ export default function LoginPage() {
               aria-disabled={isSubmitting}
               className="
                 w-full flex items-center justify-center gap-2
-                px-4 py-2.5 text-sm font-semibold text-white
-                bg-[#1D4ED8] hover:bg-[#1E40AF] active:bg-[#1E3A8A]
-                rounded-lg transition-colors
-                focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:ring-offset-2
-                disabled:opacity-60 disabled:cursor-not-allowed
+                px-4 py-2.5 text-sm font-semibold text-primary-foreground
+                	bg-primary hover:opacity-90
+                rounded-full transition-colors
+                focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
+                disabled:opacity-60 disabled:cursor-not-allowed min-h-11  
                 
               "
             >
@@ -220,24 +216,24 @@ export default function LoginPage() {
         </main>
 
         {/* Lien inscription */}
-        <p className="text-center mt-6 text-sm text-[#475569]">
+        <p className="text-center mt-6 text-sm text-muted-foreground">
           Pas encore de compte ?{' '}
           <Link
             to="/register"
-            className="text-[#1D4ED8] font-medium hover:text-[#1E40AF] hover:underline"
+            className="	text-primary font-medium  hover:underline"
           >
             Créer un compte
           </Link>
         </p>
 
         {/* Mention légale */}
-        <p className="text-center mt-4 text-xs text-[#94A3B8]">
+        <p className="text-center mt-4 text-xs text-muted-foreground">
           En vous connectant, vous acceptez nos{' '}
-          <a href="/mentions-legales" className="underline hover:text-[#475569]">
+          <a href="/mentions-legales" className="underline hover:text-foreground">
             mentions légales
           </a>{' '}
           et notre{' '}
-          <a href="/confidentialite" className="underline hover:text-[#475569]">
+          <a href="/confidentialite" className="underline hover:text-foreground">
             politique de confidentialité
           </a>
         </p>

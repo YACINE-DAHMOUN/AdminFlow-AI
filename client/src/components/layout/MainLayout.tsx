@@ -60,9 +60,10 @@ export default function MainLayout() {
       {!isNavOpen && (
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-foreground focus:shadow-md"
+          className="skip-link"
+          z
         >
-          Aller au contenu
+          Aller au contenu principal
         </a>
       )}
 
