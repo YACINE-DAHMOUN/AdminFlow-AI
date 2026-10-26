@@ -133,7 +133,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[bg-background] flex flex-col justify-center py-8">
+    <div className="min-h-screen bg-bg-background flex flex-col justify-center py-8">
 
       <a href="#main-content" className="skip-link">
         Aller au contenu principal
