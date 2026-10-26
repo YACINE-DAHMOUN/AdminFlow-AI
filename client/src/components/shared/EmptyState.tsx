@@ -15,11 +15,11 @@ export function EmptyState({
   ctaTo = '/upload',
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-14 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-8 md:p-14 text-center  ">
       <div className="relative mb-6">
         <div className="absolute inset-0 rounded-full bg-highlight/30 blur-2xl scale-[2]" />
         <div className="relative size-16 rounded-2xl bg-highlight/15 border border-highlight/20 flex items-center justify-center">
-          <FileSearch className="size-7 text-highlight-foreground" />
+          <FileSearch className="size-7 text-highlight-foreground "aria-hidden= "true" />
         </div>
       </div>
       <h2
@@ -33,7 +33,7 @@ export function EmptyState({
       </p>
       <Link
         to={ctaTo}
-        className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+        className="inline-flex items-center min-h-11  rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity "
       >
         {ctaLabel}
       </Link>

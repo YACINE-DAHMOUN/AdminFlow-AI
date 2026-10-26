@@ -13,17 +13,17 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (isLoading) {
     return (
       <div
-        className="min-h-screen bg-[#F8FAFC] flex items-center justify-center"
+        className="min-h-screen bg-background flex items-center justify-center"
         role="status"
         aria-live="polite"
         aria-label="Chargement de l'application"
       >
         <div className="flex flex-col items-center gap-3">
           <div
-            className="w-8 h-8 border-2 border-[#1D4ED8] border-t-transparent rounded-full animate-spin"
+            className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"
             aria-hidden="true"
           />
-          <p className="text-sm text-[#475569]">Chargement...</p>
+          <p className="text-sm text-muted-foreground">Chargement...</p>
         </div>
       </div>
     )
