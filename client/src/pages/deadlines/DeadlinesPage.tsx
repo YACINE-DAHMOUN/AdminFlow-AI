@@ -62,11 +62,11 @@ export default function DeadlinesPage() {
           <p className="text-sm font-medium text-destructive">{error}</p>
         </div>
       ) : deadlines.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-14 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-8 md:p-14 text-center">
           <div className="relative mb-6">
             <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-[2]" />
             <div className="relative size-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <CalendarClock className="size-7 text-primary" />
+              <CalendarClock className="size-7 text-primary "aria-hidden= "true" />
             </div>
           </div>
           <h2
