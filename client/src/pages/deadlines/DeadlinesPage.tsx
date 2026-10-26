@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { AlertCircle, CalendarClock, Loader2 } from 'lucide-react'
+import { AlertCircle, CalendarClock, Check, Loader2 } from 'lucide-react'
 import { PageHeading } from '../../components/shared/PageHeading'
 import { deadlineService } from '../../services/deadline.service'
 import type { Deadline } from '../../types/deadline.types'
 import {StatusBadge} from "../../components/shared/StatusBadge";
+
 
 // Libellés lisibles pour les types d'échéance
 const TYPE_LABELS: Record<Deadline['type'], string> = {
@@ -23,7 +24,24 @@ export default function DeadlinesPage() {
   const [deadlines, setDeadlines] = useState<Deadline[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [pendingId, setPendingId] = useState<string | null>(null)   // l'échéance en cours de traitement
+  const [announcement, setAnnouncement] = useState('')              // message lu par le lecteur d'écran
 
+
+  const handleMarkAsDone = async (deadline: Deadline) => {
+  setPendingId(deadline.id)
+  try {
+    const updated = await deadlineService.markAsDone(deadline.id)
+    setDeadlines((prev) =>
+      prev.map((d) => (d.id === updated.id ? updated : d))
+    )
+    setAnnouncement(`Échéance "${updated.title}" marquée comme Réglée`)
+  } catch {
+    setAnnouncement('Impossible de mettre à jour cette échéance')
+  } finally {
+    setPendingId(null)
+  }
+}
   // ─── 2. Chargement des données au montage ─────────
   useEffect(() => {
     const load = async () => {
@@ -47,6 +65,8 @@ export default function DeadlinesPage() {
         title="Échéances"
         description="Suivez toutes vos échéances fiscales et administratives"
       />
+      <p className="sr-only" aria-live="polite">{announcement}</p>
+
 
       {isLoading ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
@@ -80,20 +100,42 @@ export default function DeadlinesPage() {
           </p>
         </div>
       ) : (
+        
         <ul className="space-y-3">
           {deadlines.map((deadline) => (
-            <li
-              key={deadline.id}
-              className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4"
-            >
-              <div className="min-w-0">
-                <p className="font-semibold text-foreground truncate">{deadline.title}</p>
-                <p className="text-sm text-muted-foreground">
-                  {formatDate(deadline.dueDate)} · {TYPE_LABELS[deadline.type]}
-                </p>
-              </div>
-              <StatusBadge status={deadline.status} />
-            </li>
+        <li
+          key={deadline.id}
+          className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          {/* Gauche : titre + date */}
+          <div className="min-w-0">
+            <p className="font-semibold text-foreground truncate">{deadline.title}</p>
+            <p className="text-sm text-muted-foreground">
+              {formatDate(deadline.dueDate)} · {TYPE_LABELS[deadline.type]}
+            </p>
+          </div>
+
+          {/* Droite : badge + bouton (le bouton seulement pour les échéances actives) */}
+          <div className="flex items-center gap-2 shrink-0">
+            <StatusBadge status={deadline.status} />
+            {['PENDING', 'URGENT', 'OVERDUE'].includes(deadline.status) && (
+              <button
+                type="button"
+                onClick={() => handleMarkAsDone(deadline)}
+                disabled={pendingId === deadline.id}
+                aria-label={`Marquer « ${deadline.title} » comme réglée`}
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-sm font-medium text-foreground hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {pendingId === deadline.id ? (
+                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Check className="size-4" aria-hidden="true" />
+                )}
+                Réglée
+              </button>
+            )}
+          </div>
+        </li>
           ))}
         </ul>
       )}
