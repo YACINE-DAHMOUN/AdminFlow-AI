@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -26,12 +26,19 @@ export default function LoginPage() {
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   })
+  const { isAuthenticated } = useAuth()
+
+     // Dès que l'utilisateur est connecté (après login, ou s'il arrive ici déjà connecté),
+   // on l'envoie vers le tableau de bord.
+   useEffect(() => {
+     if (isAuthenticated) navigate({ to: '/dashboard', replace: true })
+   }, [isAuthenticated, navigate])!
 
   const onSubmit = async (data: LoginForm) => {
     try {
       setServerError('')
       await login(data)
-      navigate({ to: '/dashboard' })
+     
     } catch (error: any) {
       setServerError(
         error?.response?.data?.message || 'Une erreur est survenue'

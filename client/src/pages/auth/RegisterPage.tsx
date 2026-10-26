@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { AlertCircle, Eye, EyeOff, FileText, Loader2, CheckCircle2 } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, Sparkles, Loader2, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../../store/auth.context'
 
 const registerSchema = z.object({
@@ -39,17 +39,19 @@ function PasswordStrength({ password }: { password: string }) {
 
   const validCount = checks.filter(c => c.valid).length
   const strength = validCount <= 2 ? 'Faible' : validCount <= 4 ? 'Moyen' : 'Fort'
-  const strengthColor = validCount <= 2 ? '#DC2626' : validCount <= 4 ? '#D97706' : '#16A34A'
+  const strengthColor =   validCount <= 2 ? 'var(--destructive)' : validCount <= 4 ? 'var(--highlight)' : 'var(--primary)'
   const strengthWidth = `${(validCount / checks.length) * 100}%`
+  const strengthTextColor =
+  validCount <= 2 ? 'var(--destructive)' : validCount <= 4 ? 'var(--highlight-foreground)' : 'var(--primary)'
 
   return (
-    <div className="mt-3" id="password-requirements">
+    <div className="mt-3" >
       {/* Barre de force */}
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-xs text-[#475569]">Force du mot de passe</span>
+        <span className="text-xs text-muted-foreground">Force du mot de passe</span>
         <span
-          className="text-xs font-semibold"
-          style={{ color: strengthColor }}
+          className="text-highlight-foreground font-semibold"
+          style={{ color: strengthTextColor }}
           aria-live="polite"
           aria-label={`Force du mot de passe : ${strength}`}
         >
@@ -57,7 +59,7 @@ function PasswordStrength({ password }: { password: string }) {
         </span>
       </div>
       <div
-        className="h-1.5 w-full bg-[#E2E8F0] rounded-full overflow-hidden"
+        className="h-1.5 w-full bg-muted rounded-full overflow-hidden"
         role="progressbar"
         aria-valuenow={validCount}
         aria-valuemin={0}
@@ -76,7 +78,7 @@ function PasswordStrength({ password }: { password: string }) {
           <li
             key={check.label}
             className={`flex items-center gap-2 text-xs transition-colors ${
-              check.valid ? 'text-[#16A34A]' : 'text-[#94A3B8]'
+              check.valid ? 'text-primary' : 'text-muted-foreground'
             }`}
           >
             <CheckCircle2
@@ -111,12 +113,18 @@ export default function RegisterPage() {
   })
 
   const passwordValue = watch('password', '')
+   const {  isAuthenticated } = useAuth()
+
+      // Dès que l'utilisateur est connecté (après login, ou s'il arrive ici déjà connecté),
+   // on l'envoie vers le tableau de bord.
+   useEffect(() => {
+     if (isAuthenticated) navigate({ to: '/dashboard', replace: true })
+   }, [isAuthenticated, navigate])
 
   const onSubmit = async (data: RegisterForm) => {
     try {
       setServerError('')
       await registerUser({ email: data.email, password: data.password })
-      navigate({ to: '/dashboard' })
     } catch (error: any) {
       setServerError(
         error?.response?.data?.message || 'Une erreur est survenue'
@@ -125,7 +133,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center py-8">
+    <div className="min-h-screen bg-[bg-background] flex flex-col justify-center py-8">
 
       <a href="#main-content" className="skip-link">
         Aller au contenu principal
@@ -135,23 +143,20 @@ export default function RegisterPage() {
 
         {/* Logo + Titre */}
         <div className="text-center mb-8">
-          <div
-            className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#1D4ED8] mb-4"
-            aria-hidden="true"
-          >
-            <FileText className="w-6 h-6 text-white" />
+         <div className="inline-flex items-center justify-center size-12 rounded-xl bg-sidebar-primary mb-4" aria-hidden="true">
+                <Sparkles className="size-6 text-sidebar-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-semibold text-[#0F172A]">
+          <h1 className="text-2xl font-semibold text-foreground font-heading">
             Créer un compte
           </h1>
-          <p className="mt-1 text-sm text-[#475569]">
+          <p className="mt-1 text-sm text-muted-foreground">
             Commencez à simplifier votre administratif
           </p>
         </div>
 
         {/* Badge plan gratuit */}
         <div className="flex justify-center mb-6">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F0FDF4] border border-[#BBF7D0] rounded-full text-xs font-medium text-[#16A34A]">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-secondary bg-secondary text-xs font-medium text-secondary-foreground">
             <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
             Gratuit — 5 documents par mois inclus
           </span>
@@ -160,7 +165,7 @@ export default function RegisterPage() {
         {/* Carte formulaire */}
         <main
           id="main-content"
-          className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-8"
+          className="bg-card rounded-xl border border-border shadow-sm p-8"
         >
 
           {/* Erreur serveur */}
@@ -168,13 +173,13 @@ export default function RegisterPage() {
             <div
               role="alert"
               aria-live="polite"
-              className="flex items-start gap-3 p-4 mb-6 bg-[#FEF2F2] border border-[#FECACA] rounded-lg"
+              className="flex items-start gap-3 p-4 mb-6 bg-destructive/10 border-destructive/20 rounded-lg"
             >
               <AlertCircle
-                className="w-5 h-5 text-[#DC2626] mt-0.5 shrink-0"
+                className="w-5 h-5 text-destructive mt-0.5 shrink-0"
                 aria-hidden="true"
               />
-              <p className="text-sm text-[#DC2626] font-medium">
+              <p className="text-sm text-destructive font-medium">
                 {serverError}
               </p>
             </div>
@@ -188,9 +193,9 @@ export default function RegisterPage() {
 
             {/* Email */}
             <div className="mb-5">
-              <label htmlFor="email" className="block text-sm font-medium text-[#0F172A] mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
                 Adresse email professionnelle
-                <span aria-hidden="true" className="text-[#DC2626] ml-1">*</span>
+                <span aria-hidden="true" className="text-destructive ml-1">*</span>
               </label>
               <input
                 id="email"
@@ -202,11 +207,11 @@ export default function RegisterPage() {
                 aria-describedby={errors.email ? 'reg-email-error' : undefined}
                 className={`
                   w-full px-3.5 py-2.5 text-sm rounded-lg border transition-colors
-                  bg-white text-[#0F172A] placeholder:text-[#94A3B8]
-                  focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:ring-offset-0
+                  bg-card text-foreground placeholder:text-muted-foreground
+                  focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0
                   ${errors.email
-                    ? 'border-[#DC2626] focus:ring-[#DC2626]'
-                    : 'border-[#CBD5E1] hover:border-[#94A3B8]'
+                    ? 'border-destructive focus:ring-destructive'
+                    : 'border-border hover:border-muted-foreground'
                   }
                 `}
                 {...register('email')}
@@ -215,7 +220,7 @@ export default function RegisterPage() {
                 <p
                   id="reg-email-error"
                   role="alert"
-                  className="flex items-center gap-1.5 mt-1.5 text-xs text-[#DC2626] font-medium"
+                  className="flex items-center gap-1.5 mt-1.5 text-xs text-destructive font-medium"
                 >
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                   {errors.email.message}
@@ -225,9 +230,9 @@ export default function RegisterPage() {
 
             {/* Mot de passe */}
             <div className="mb-5">
-              <label htmlFor="reg-password" className="block text-sm font-medium text-[#0F172A] mb-1.5">
+              <label htmlFor="reg-password" className="block text-sm font-medium text-foreground mb-1.5">
                 Mot de passe
-                <span aria-hidden="true" className="text-[#DC2626] ml-1">*</span>
+                <span aria-hidden="true" className="text-destructive ml-1">*</span>
               </label>
               <div className="relative">
                 <input
@@ -237,14 +242,13 @@ export default function RegisterPage() {
                   placeholder="••••••••"
                   aria-required="true"
                   aria-invalid={errors.password ? 'true' : 'false'}
-                  aria-describedby="password-requirements"
-                  className={`
-                    w-full px-3.5 py-2.5 pr-11 text-sm rounded-lg border transition-colors
-                    bg-white text-[#0F172A] placeholder:text-[#94A3B8]
-                    focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:ring-offset-0
+                  aria-describedby={errors.password ? 'password-error password-requirements' : 'password-requirements'}                  className={`
+                    w-full px-3.5 py-2.5 pr-12 text-sm rounded-lg border transition-colors
+                    bg-card text-foreground placeholder:text-muted-foreground
+                    focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0
                     ${errors.password
-                      ? 'border-[#DC2626] focus:ring-[#DC2626]'
-                      : 'border-[#CBD5E1] hover:border-[#94A3B8]'
+                      ? 'border-destructive focus:ring-destructive'
+                      : 'border-border hover:border-muted-foreground'
                     }
                   `}
                   {...register('password')}
@@ -253,7 +257,7 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569] transition-colors p-1 rounded-full focus:outline-none focus:ring-1 focus:ring-[#1D4ED8] focus:ring-offset-1"
+                  className="absolute top-1/2 -translate-y-1/2 right-0 inline-flex size-11 items-center justify-center rounded-full focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword
                     ? <EyeOff className="w-4 h-4" aria-hidden="true" />
@@ -264,7 +268,7 @@ export default function RegisterPage() {
               {errors.password && (
                 <p
                   role="alert"
-                  className="flex items-center gap-1.5 mt-1.5 text-xs text-[#DC2626] font-medium"
+                  className="flex items-center gap-1.5 mt-1.5 text-xs text-destructive font-medium"
                 >
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                   {errors.password.message}
@@ -277,9 +281,9 @@ export default function RegisterPage() {
 
             {/* Confirmation mot de passe */}
             <div className="mb-6">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#0F172A] mb-1.5">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-1.5">
                 Confirmer le mot de passe
-                <span aria-hidden="true" className="text-[#DC2626] ml-1">*</span>
+                <span aria-hidden="true" className="text-destructive ml-1">*</span>
               </label>
               <div className="relative">
                 <input
@@ -291,12 +295,12 @@ export default function RegisterPage() {
                   aria-invalid={errors.confirmPassword ? 'true' : 'false'}
                   aria-describedby={errors.confirmPassword ? 'confirm-error' : undefined}
                   className={`
-                    w-full px-3.5 py-2.5 pr-11 text-sm rounded-lg border transition-colors
-                    bg-white text-[#0F172A] placeholder:text-[#94A3B8]
-                    focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:ring-offset-0
+                    w-full px-3.5 py-2.5 pr-12 text-sm rounded-lg border transition-colors
+                    bg-card text-foreground placeholder:text-muted-foreground
+                    focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0
                     ${errors.confirmPassword
-                      ? 'border-[#DC2626] focus:ring-[#DC2626]'
-                      : 'border-[#CBD5E1] hover:border-[#94A3B8]'
+                      ? 'border-destructive focus:ring-destructive'
+                      : 'border-border hover:border-muted-foreground'
                     }
                   `}
                   {...register('confirmPassword')}
@@ -305,7 +309,7 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowConfirm(!showConfirm)}
                   aria-label={showConfirm ? 'Masquer la confirmation' : 'Afficher la confirmation'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569] transition-colors p-1 rounded"
+                  className="absolute top-1/2 -translate-y-1/2 right-0 inline-flex size-11 items-center justify-center"
                 >
                   {showConfirm
                     ? <EyeOff className="w-4 h-4" aria-hidden="true" />
@@ -317,7 +321,7 @@ export default function RegisterPage() {
                 <p
                   id="confirm-error"
                   role="alert"
-                  className="flex items-center gap-1.5 mt-1.5 text-xs text-[#DC2626] font-medium"
+                  className="flex items-center gap-1.5 mt-1.5 text-xs text-destructive font-medium"
                 >
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                   {errors.confirmPassword.message}
@@ -332,12 +336,12 @@ export default function RegisterPage() {
               aria-disabled={isSubmitting}
               className="
                 w-full flex items-center justify-center gap-2
-                px-4 py-2.5 text-sm font-semibold text-white
-                bg-[#1D4ED8] hover:bg-[#1E40AF] active:bg-[#1E3A8A]
-                rounded-lg transition-colors
-                focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:ring-offset-2
+                px-4 py-2.5 text-sm font-semibold text-primary-foreground
+                bg-primary hover:opacity-90]
+                rounded-full transition-colors
+                focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
                 disabled:opacity-60 disabled:cursor-not-allowed
-                min-h-[44px]
+                min-h-11
               "
             >
               {isSubmitting ? (
@@ -354,24 +358,24 @@ export default function RegisterPage() {
         </main>
 
         {/* Lien connexion */}
-        <p className="text-center mt-6 text-sm text-[#475569]">
+        <p className="text-center mt-6 text-sm text-muted-foreground">
           Déjà un compte ?{' '}
           <Link
             to="/login"
-            className="text-[#1D4ED8] font-medium hover:text-[#1E40AF] hover:underline"
+            className="text-primary font-medium  hover:underline"
           >
             Se connecter
           </Link>
         </p>
 
         {/* Mentions légales */}
-        <p className="text-center mt-4 text-xs text-[#94A3B8] leading-relaxed">
+        <p className="text-center mt-4 text-xs text-muted-foreground leading-relaxed">
           En créant un compte, vous acceptez nos{' '}
-          <a href="/mentions-legales" className="underline hover:text-[#475569]">
+          <a href="/mentions-legales" className="underline hover:text-foreground">
             mentions légales
           </a>{' '}
           et notre{' '}
-          <a href="/confidentialite" className="underline hover:text-[#475569]">
+          <a href="/confidentialite" className="underline hover:text-foreground">
             politique de confidentialité
           </a>
         </p>
