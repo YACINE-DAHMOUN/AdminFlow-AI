@@ -61,7 +61,7 @@ export default function MainLayout() {
         <a
           href="#main-content"
           className="skip-link"
-          z
+          
         >
           Aller au contenu principal
         </a>
