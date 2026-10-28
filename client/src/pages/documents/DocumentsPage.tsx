@@ -5,6 +5,7 @@ import { EmptyState } from '../../components/shared/EmptyState'
 import { documentService } from '../../services/document.service'
 import type {  DocumentSummary, DocumentType } from '../../types/document.types'
 import { AnalysisBadge } from '../../components/shared/AnalysisBadge'
+import { formatDate } from '../../utils/format'
 
 // ═══════════ Configuration (hors du composant : créée une seule fois) ═══════════
 
@@ -21,8 +22,6 @@ const TYPE_LABELS: Record<DocumentType, string> = {
 
 
 
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
 // 250880 → « 245 Ko » ; null → null (on n'affiche rien)
 const formatFileSize = (bytes: number | null): string | null => {
