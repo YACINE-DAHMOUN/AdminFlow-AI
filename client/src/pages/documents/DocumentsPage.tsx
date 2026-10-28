@@ -3,7 +3,8 @@ import { AlertCircle, Loader2 } from 'lucide-react'
 import { PageHeading } from '../../components/shared/PageHeading'
 import { EmptyState } from '../../components/shared/EmptyState'
 import { documentService } from '../../services/document.service'
-import type { DocumentStatus, DocumentSummary, DocumentType } from '../../types/document.types'
+import type {  DocumentSummary, DocumentType } from '../../types/document.types'
+import { AnalysisBadge } from '../../components/shared/AnalysisBadge'
 
 // ═══════════ Configuration (hors du composant : créée une seule fois) ═══════════
 
@@ -18,13 +19,7 @@ const TYPE_LABELS: Record<DocumentType, string> = {
   OTHER: 'Autre',
 }
 
-// Badge de l'état de l'analyse IA (mêmes couleurs que les échéances pour le même sens)
-const ANALYSIS_STATUS: Record<DocumentStatus, { label: string; className: string }> = {
-  PENDING: { label: 'En attente', className: 'bg-muted text-muted-foreground' },
-  PROCESSING: { label: 'Analyse en cours', className: 'bg-highlight/25 text-highlight-foreground' },
-  DONE: { label: 'Analysé', className: 'bg-secondary text-secondary-foreground' },
-  ERROR: { label: 'Échec', className: 'bg-destructive/10 text-destructive' },
-}
+
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -96,7 +91,6 @@ export default function DocumentsPage() {
         // 4. Liste
         <ul className="space-y-3">
           {documents.map((doc) => {
-            const analysis = ANALYSIS_STATUS[doc.status]
             const size = formatFileSize(doc.fileSize)
 
             return (
@@ -104,11 +98,7 @@ export default function DocumentsPage() {
                 {/* Ligne 1 : nom du fichier + badge d'analyse */}
                 <div className="flex items-start justify-between gap-3">
                   <p className="min-w-0 truncate font-semibold text-foreground">{doc.name}</p>
-                  <span
-                    className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap ${analysis.className}`}
-                  >
-                    {analysis.label}
-                  </span>
+                  <AnalysisBadge status={doc.status} />
                 </div>
 
                 {/* Ligne 2 : type · date · taille (la taille seulement si elle existe) */}

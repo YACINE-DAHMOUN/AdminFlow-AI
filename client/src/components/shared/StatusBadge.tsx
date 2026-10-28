@@ -1,4 +1,5 @@
 import type { DeadlineStatus } from '../../types/deadline.types'
+import { Badge } from './Badge'
 
 // Hors du composant : créé une seule fois, pas à chaque rendu
 const STATUS_CONFIG: Record<DeadlineStatus, { label: string; className: string }> = {
@@ -17,10 +18,6 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   const { label, className } = STATUS_CONFIG[status]
 
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap ${className}`}
-    >
-      {label}
-    </span>
+    <Badge className={className}>{label}</Badge>
   )
 }
