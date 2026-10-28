@@ -4,6 +4,8 @@ import { PageHeading } from '../../components/shared/PageHeading'
 import { deadlineService } from '../../services/deadline.service'
 import type { Deadline, DeadlineStatus, DeadlineType } from '../../types/deadline.types'
 import { StatusBadge } from '../../components/shared/StatusBadge'
+import { formatDate } from '../../utils/format'
+import { ACTIVE_STATUSES, isActive } from '../../utils/deadline.utils'
 
 // Libellés lisibles pour les types d'échéance
 const TYPE_LABELS: Record<Deadline['type'], string> = {
@@ -19,13 +21,9 @@ const PORTAL_LINKS: Partial<Record<DeadlineType, { label: string; url: string}>>
   IMPOTS : { label : 'Déclarer et payer sur Impots.gouv.fr', url: 'https://www.impots.gouv.fr' },
 }
 
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
 type FilterKey = 'ALL' | 'TODO' | 'OVERDUE' | 'DONE'
 
-const ACTIVE_STATUSES: DeadlineStatus[] = ['PENDING', 'URGENT', 'OVERDUE']
-const isActive = (status: DeadlineStatus) => ACTIVE_STATUSES.includes(status)
 
 const FILTERS: { key: FilterKey; label: string; statuses: DeadlineStatus[] | null; emptyText: string }[] = [
   { key: 'ALL', label: 'Toutes', statuses: null, emptyText: 'Aucune échéance.' },
