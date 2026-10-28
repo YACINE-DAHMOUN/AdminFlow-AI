@@ -20,9 +20,12 @@ const formatDate = (iso: string) =>
 
 type FilterKey = 'ALL' | 'TODO' | 'OVERDUE' | 'DONE'
 
+const ACTIVE_STATUSES: DeadlineStatus[] = ['PENDING', 'URGENT', 'OVERDUE']
+const isActive = (status: DeadlineStatus) => ACTIVE_STATUSES.includes(status)
+
 const FILTERS: { key: FilterKey; label: string; statuses: DeadlineStatus[] | null; emptyText: string }[] = [
   { key: 'ALL', label: 'Toutes', statuses: null, emptyText: 'Aucune échéance.' },
-  { key: 'TODO', label: 'À faire', statuses: ['PENDING', 'URGENT', 'OVERDUE'], emptyText: 'Rien à faire pour le moment : tout est réglé.' },
+  { key: 'TODO', label: 'À faire', statuses: ACTIVE_STATUSES, emptyText: 'Rien à faire pour le moment : tout est réglé.' },
   { key: 'OVERDUE', label: 'En retard', statuses: ['OVERDUE'], emptyText: 'Aucune échéance en retard.' },
   { key: 'DONE', label: 'Réglées', statuses: ['DONE'], emptyText: 'Aucune échéance réglée pour le moment.' },
 ]
@@ -121,17 +124,17 @@ export default function DeadlinesPage() {
             className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 py-1 md:-mx-1 md:px-1"
           >
             {FILTERS.map((f) => {
-              const isActive = filter === f.key
+              const isSelected = filter === f.key
               return (
                 <button
                   key={f.key}
                   type="button"
                   onClick={() => setFilter(f.key)}
-                  aria-pressed={isActive}
+                  aria-pressed={isSelected}
                   className={[
                     'inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-4 text-sm font-medium transition-colors',
                     'outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',                   
-                     isActive
+                     isSelected
                       ? 'bg-primary text-primary-foreground'
                       : 'border border-border bg-card text-muted-foreground hover:text-foreground',
                   ].join(' ')}
@@ -140,7 +143,7 @@ export default function DeadlinesPage() {
                   <span
                     className={[
                       'rounded-full px-1.5 text-xs tabular-nums',
-                      isActive ? 'bg-primary-foreground/20' : 'bg-muted',
+                      isSelected ? 'bg-primary-foreground/20' : 'bg-muted',
                     ].join(' ')}
                   >
                     {countFor(f.statuses)}
@@ -173,7 +176,7 @@ export default function DeadlinesPage() {
                   {/* Droite : badge + bouton (seulement pour les échéances actives) */}
                   <div className="flex items-center gap-2 shrink-0">
                     <StatusBadge status={deadline.status} />
-                    {['PENDING', 'URGENT', 'OVERDUE'].includes(deadline.status) && (
+                    {isActive(deadline.status) && (
                       <button
                         type="button"
                         onClick={() => handleMarkAsDone(deadline)}
