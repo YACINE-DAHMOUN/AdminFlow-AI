@@ -8,11 +8,11 @@ const ANALYSIS_STATUS: Record<DocumentStatus, { label: string; className: string
   DONE: { label: 'Analysé', className: 'bg-secondary text-secondary-foreground' },
   ERROR: { label: 'Échec', className: 'bg-destructive/10 text-destructive' },
 }
-interface StatusBadgeProps {
+interface AnalysisBadgeProps {
   status: DocumentStatus
 }
 
-export function AnalysisBadge({ status }: StatusBadgeProps) {
+export function AnalysisBadge({ status }: AnalysisBadgeProps) {
   const { label, className } = ANALYSIS_STATUS[status]
 
   return (
