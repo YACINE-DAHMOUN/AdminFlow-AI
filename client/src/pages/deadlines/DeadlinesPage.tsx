@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { AlertCircle, CalendarClock, Check, Loader2 } from 'lucide-react'
+import { AlertCircle, CalendarClock, Check, ExternalLink, Loader2 } from 'lucide-react'
 import { PageHeading } from '../../components/shared/PageHeading'
 import { deadlineService } from '../../services/deadline.service'
-import type { Deadline, DeadlineStatus } from '../../types/deadline.types'
+import type { Deadline, DeadlineStatus, DeadlineType } from '../../types/deadline.types'
 import { StatusBadge } from '../../components/shared/StatusBadge'
 
 // Libellés lisibles pour les types d'échéance
@@ -13,6 +13,10 @@ const TYPE_LABELS: Record<Deadline['type'], string> = {
   FACTURE: 'Facture',
   COURRIER: 'Courrier',
   OTHER: 'Autre',
+}
+const PORTAL_LINKS: Partial<Record<DeadlineType, { label: string; url: string}>> = {
+  URSSAF: { label: 'Déclarer et payer sur l\'URSSAF', url: 'https://www.autoentrepreneur.urssaf.fr' },
+  IMPOTS : { label : 'Déclarer et payer sur Impots.gouv.fr', url: 'https://www.impots.gouv.fr' },
 }
 
 const formatDate = (iso: string) =>
@@ -171,6 +175,20 @@ export default function DeadlinesPage() {
                     <p className="text-sm text-muted-foreground">
                       {formatDate(deadline.dueDate)} · {TYPE_LABELS[deadline.type]}
                     </p>
+                    {PORTAL_LINKS[deadline.type] && isActive(deadline.status) &&  (
+                      <a
+                        href={PORTAL_LINKS[deadline.type] ?.url }
+                        target="_blank"         
+                        rel="noopener noreferrer"                               
+                        className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
+
+                      >
+                        {PORTAL_LINKS[deadline.type]?.label}
+                        <ExternalLink className="size-3" aria-hidden="true" />
+                        <span className="sr-only"> (ouvrir dans un nouvel onglet)</span>
+                      </a>
+                    )}
+                    
                   </div>
 
                   {/* Droite : badge + bouton (seulement pour les échéances actives) */}
