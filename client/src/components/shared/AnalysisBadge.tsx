@@ -1,4 +1,4 @@
-import { DocumentStatus } from '../../types/document.types'
+import type { DocumentStatus } from '../../types/document.types'
 import { Badge } from './Badge'
 
 // Badge de l'état de l'analyse IA (mêmes couleurs que les échéances pour le même sens)
