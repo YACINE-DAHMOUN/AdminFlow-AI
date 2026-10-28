@@ -120,8 +120,9 @@ export default function DashboardPage() {
       <h2 id="next-deadlines-title" className="font-heading text-lg font-bold text-foreground">
         Prochaines échéances
       </h2>
-      <Link to="/deadlines" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
-        Voir toutes les échéances
+      <Link to="/deadlines" aria-label="Voir toutes les échéances" className="shrink-0 whitespace-nowrap text-sm font-medium text-primary underline-offset-4 hover:underline ">
+        Tout voir
+        
       </Link>
     </div>
 
