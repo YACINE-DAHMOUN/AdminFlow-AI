@@ -7,3 +7,156 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  role         Role          @default(USER)
+  plan         Plan          @default(FREE)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  deadlines    Deadline[]
+  documents    Document[]
+  integrations Integration[]
+  profile      Profile?
+
+  @@map("users")
+}
+
+model Profile {
+  id          String  @id @default(uuid())
+  userId      String  @unique @map("user_id")
+  companyName String? @map("company_name")
+  siren       String?
+  taxRegime   String? @map("tax_regime")
+  phone       String?
+  address     String?
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Document {
+  id            String         @id @default(uuid())
+  userId        String         @map("user_id")
+  name          String
+  type          DocumentType   @default(OTHER)
+  fileUrl       String         @map("file_url")
+  fileSize      Int?           @map("file_size")
+  mimeType      String?        @map("mime_type")
+  extractedText String?        @map("extracted_text")
+  extractedData Json?          @map("extracted_data")
+  summary       String?
+  status        DocumentStatus @default(PENDING)
+  urgency       Urgency        @default(LOW)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  deadlines     Deadline[]
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+model Deadline {
+  id          String         @id @default(uuid())
+  userId      String         @map("user_id")
+  documentId  String?        @map("document_id")
+  title       String
+  description String?
+  dueDate     DateTime       @map("due_date")
+  status      DeadlineStatus @default(PENDING)
+  urgency     Urgency        @default(LOW)
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  document    Document?      @relation(fields: [documentId], references: [id])
+  type        DeadlineType   @default(OTHER)
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("deadlines")
+}
+
+model Integration {
+  id           String            @id @default(uuid())
+  userId       String            @map("user_id")
+  provider     String
+  accessToken  String?           @map("access_token")
+  refreshToken String?           @map("refresh_token")
+  status       IntegrationStatus @default(ACTIVE)
+  metadata     Json?
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("integrations")
+}
+
+model AiLog {
+  id         String   @id @default(uuid())
+  documentId String   @map("document_id")
+  prompt     String
+  response   String
+  model      String   @default("llama3")
+  duration   Int?
+  success    Boolean  @default(true)
+  error      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("ai_logs")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Plan {
+  FREE
+  PLUS
+  PRO
+}
+
+enum DocumentType {
+  URSSAF
+  IMPOTS
+  BANQUE
+  CONTRAT
+  FACTURE
+  COURRIER
+  OTHER
+}
+
+enum DocumentStatus {
+  PENDING
+  PROCESSING
+  DONE
+  ERROR
+}
+
+enum DeadlineStatus {
+  PENDING
+  URGENT
+  DONE
+  OVERDUE
+  CANCELLED
+}
+enum DeadlineType {
+  URSSAF
+  IMPOTS
+  BANQUE
+  FACTURE
+  COURRIER
+  OTHER
+}
+
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}

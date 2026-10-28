@@ -1,1 +1,75 @@
 @import "tailwindcss";
+
+@theme inline {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Bricolage Grotesque", "Inter", ui-sans-serif, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --radius-lg: 0.75rem;
+  --radius-xl: 1.05rem;
+  --radius-2xl: 1.35rem;
+}
+
+:root {
+  color-scheme: light;
+  --background: oklch(0.976 0.008 85);
+  --foreground: oklch(0.23 0.03 195);
+  --card: oklch(0.995 0.003 85);
+  --card-foreground: oklch(0.23 0.03 195);
+  --primary: oklch(0.4 0.075 172);
+  --primary-foreground: oklch(0.985 0.005 85);
+  --secondary: oklch(0.945 0.018 165);
+  --secondary-foreground: oklch(0.32 0.06 175);
+  --muted: oklch(0.948 0.01 85);
+  --muted-foreground: oklch(0.5 0.02 195);
+  --highlight: oklch(0.82 0.14 78);
+  --highlight-foreground: oklch(0.28 0.05 60);
+  --destructive: oklch(0.577 0.2 27);
+  --border: oklch(0.905 0.012 85);
+  --input: oklch(0.905 0.012 85);
+  --ring: oklch(0.4 0.075 172);
+  --sidebar: oklch(0.255 0.04 190);
+  --sidebar-foreground: oklch(0.93 0.015 165);
+  --sidebar-muted: oklch(0.7 0.03 175);
+  --sidebar-primary: oklch(0.82 0.14 78);
+  --sidebar-primary-foreground: oklch(0.25 0.04 60);
+  --sidebar-accent: oklch(0.32 0.045 185);
+  --sidebar-accent-foreground: oklch(0.98 0.005 85);
+  --sidebar-border: oklch(0.34 0.04 188);
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground font-sans antialiased; }
+}
+
+/* Lien d'évitement : caché, apparaît au premier Tab */
+@layer components {
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-foreground focus:shadow-md;
+  }
+}
