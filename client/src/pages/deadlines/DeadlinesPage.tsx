@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { AlertCircle, CalendarClock, Check, Loader2 } from 'lucide-react'
+import { AlertCircle, CalendarClock, Check, ExternalLink, Loader2 } from 'lucide-react'
 import { PageHeading } from '../../components/shared/PageHeading'
 import { deadlineService } from '../../services/deadline.service'
-import type { Deadline, DeadlineStatus } from '../../types/deadline.types'
+import type { Deadline, DeadlineStatus, DeadlineType } from '../../types/deadline.types'
 import { StatusBadge } from '../../components/shared/StatusBadge'
 
 // Libellés lisibles pour les types d'échéance
@@ -14,15 +14,22 @@ const TYPE_LABELS: Record<Deadline['type'], string> = {
   COURRIER: 'Courrier',
   OTHER: 'Autre',
 }
+const PORTAL_LINKS: Partial<Record<DeadlineType, { label: string; url: string}>> = {
+  URSSAF: { label: 'Déclarer et payer sur l\'URSSAF', url: 'https://www.autoentrepreneur.urssaf.fr' },
+  IMPOTS : { label : 'Déclarer et payer sur Impots.gouv.fr', url: 'https://www.impots.gouv.fr' },
+}
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
 type FilterKey = 'ALL' | 'TODO' | 'OVERDUE' | 'DONE'
 
+const ACTIVE_STATUSES: DeadlineStatus[] = ['PENDING', 'URGENT', 'OVERDUE']
+const isActive = (status: DeadlineStatus) => ACTIVE_STATUSES.includes(status)
+
 const FILTERS: { key: FilterKey; label: string; statuses: DeadlineStatus[] | null; emptyText: string }[] = [
   { key: 'ALL', label: 'Toutes', statuses: null, emptyText: 'Aucune échéance.' },
-  { key: 'TODO', label: 'À faire', statuses: ['PENDING', 'URGENT', 'OVERDUE'], emptyText: 'Rien à faire pour le moment : tout est réglé.' },
+  { key: 'TODO', label: 'À faire', statuses: ACTIVE_STATUSES, emptyText: 'Rien à faire pour le moment : tout est réglé.' },
   { key: 'OVERDUE', label: 'En retard', statuses: ['OVERDUE'], emptyText: 'Aucune échéance en retard.' },
   { key: 'DONE', label: 'Réglées', statuses: ['DONE'], emptyText: 'Aucune échéance réglée pour le moment.' },
 ]
@@ -121,17 +128,17 @@ export default function DeadlinesPage() {
             className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 py-1 md:-mx-1 md:px-1"
           >
             {FILTERS.map((f) => {
-              const isActive = filter === f.key
+              const isSelected = filter === f.key
               return (
                 <button
                   key={f.key}
                   type="button"
                   onClick={() => setFilter(f.key)}
-                  aria-pressed={isActive}
+                  aria-pressed={isSelected}
                   className={[
                     'inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-4 text-sm font-medium transition-colors',
                     'outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',                   
-                     isActive
+                     isSelected
                       ? 'bg-primary text-primary-foreground'
                       : 'border border-border bg-card text-muted-foreground hover:text-foreground',
                   ].join(' ')}
@@ -140,7 +147,7 @@ export default function DeadlinesPage() {
                   <span
                     className={[
                       'rounded-full px-1.5 text-xs tabular-nums',
-                      isActive ? 'bg-primary-foreground/20' : 'bg-muted',
+                      isSelected ? 'bg-primary-foreground/20' : 'bg-muted',
                     ].join(' ')}
                   >
                     {countFor(f.statuses)}
@@ -168,12 +175,26 @@ export default function DeadlinesPage() {
                     <p className="text-sm text-muted-foreground">
                       {formatDate(deadline.dueDate)} · {TYPE_LABELS[deadline.type]}
                     </p>
+                    {PORTAL_LINKS[deadline.type] && isActive(deadline.status) &&  (
+                      <a
+                        href={PORTAL_LINKS[deadline.type] ?.url }
+                        target="_blank"         
+                        rel="noopener noreferrer"                               
+                        className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
+
+                      >
+                        {PORTAL_LINKS[deadline.type]?.label}
+                        <ExternalLink className="size-3" aria-hidden="true" />
+                        <span className="sr-only"> (ouvrir dans un nouvel onglet)</span>
+                      </a>
+                    )}
+                    
                   </div>
 
                   {/* Droite : badge + bouton (seulement pour les échéances actives) */}
                   <div className="flex items-center gap-2 shrink-0">
                     <StatusBadge status={deadline.status} />
-                    {['PENDING', 'URGENT', 'OVERDUE'].includes(deadline.status) && (
+                    {isActive(deadline.status) && (
                       <button
                         type="button"
                         onClick={() => handleMarkAsDone(deadline)}
