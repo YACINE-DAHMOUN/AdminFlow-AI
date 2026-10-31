@@ -58,7 +58,6 @@ export const documentService = {
         documentId,
         extractedText
       )
-        console.log('AI ANALYSIS =>', analysis) 
       // Étape 6 — Créer les échéances détectées automatiquement
       if (analysis.dates && analysis.dates.length > 0) {
         console.log('📅 Création des échéances détectées...')
@@ -140,6 +139,7 @@ async function createDeadlinesFromAnalysis(
   const deadlineDates = analysis.dates.filter(
     (d: any) => d.type === 'DEADLINE' || d.type === 'FIN'
   )
+     let createdCount = 0
 
   for (const dateInfo of deadlineDates) {
     if (!dateInfo.date || dateInfo.date === 'null') continue
@@ -157,6 +157,7 @@ async function createDeadlinesFromAnalysis(
 
       if (isNaN(dueDate.getTime())) continue
 
+     
       await prisma.deadline.create({
         data: {
           userId,
@@ -167,10 +168,11 @@ async function createDeadlinesFromAnalysis(
           urgency: analysis.urgency || 'LOW',
         },
       })
-
-      console.log(`📅 Échéance créée : ${dateInfo.label} — ${dateInfo.date}`)
+      createdCount++
     } catch {
       console.log(`⚠️ Impossible de créer l'échéance : ${dateInfo.date}`)
     }
   }
+    console.log(`📅 ${createdCount} échéance(s) créée(s)`)   // 3. un seul log, après la boucle
+
 }
