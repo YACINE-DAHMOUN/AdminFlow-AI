@@ -26,7 +26,6 @@ export const aiService = {
       })
 
       rawResponse = response.data.response
-      console.log('RAW RESPONSE LLAMA3 =>', rawResponse)
       console.log('RAW LENGTH =>', rawResponse.length)
       // Parser la réponse JSON de Llama 3
       const analysis = parseAnalysis(rawResponse)
@@ -143,7 +142,7 @@ function parseAnalysis(rawResponse: string): any {
     return parsed
 
   } catch (error: any) {
-    console.log('PARSE ERROR =>', error.message)
+   console.warn('⚠️ Réponse IA non lisible (JSON invalide), réparation tentée')
     return {
       documentType: 'OTHER',
       summary: 'Document analysé mais la structure n\'a pas pu être déterminée automatiquement.',
