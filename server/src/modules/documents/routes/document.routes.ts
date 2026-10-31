@@ -2,13 +2,14 @@ import { Router } from 'express'
 import { documentController } from '../controllers/document.controller'
 import { authMiddleware } from '../../../core/middlewares/auth.middleware'
 import { upload } from '../validators/document.validators'
+import { uploadLimiter } from '../../../core/middlewares/rateLimit.middleware'
 
 const router = Router()
 
 // Toutes les routes documents nécessitent une authentification
 router.use(authMiddleware)
 
-router.post('/upload', upload.single('file'), (req, res) =>
+router.post('/upload',uploadLimiter, upload.single('file'), (req, res) =>
   documentController.upload(req as any, res)
 )
 router.get('/', (req, res) =>

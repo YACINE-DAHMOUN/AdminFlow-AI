@@ -5,6 +5,7 @@ import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
 import documentRoutes from './modules/documents/routes/document.routes'
 import deadlineRoutes from './modules/deadlines/routes/deadline.routes'
+import { apiLimiter } from '../src/core/middlewares/rateLimit.middleware'
 
 // Routes
 import authRoutes from './modules/auth/routes/auth.routes'
@@ -31,6 +32,7 @@ app.get('/health', (req, res) => {
 })
 
 // Routes API
+app.use('/api', apiLimiter)
 app.use('/api/auth', authRoutes)
 app.use('/api/documents', documentRoutes)
 app.use('/api/deadlines', deadlineRoutes )
