@@ -2,7 +2,7 @@ import { prisma } from '../../../core/config/prisma'
 import { storageService } from '../../../services/storage/storage.service'
 import { ocrService } from '../../../services/ocr/ocr.service'
 import { aiService } from '../../../services/ai/ai.service'
-import type { CreateDocumentDto } from '../../../types/document.types'
+import { AppError } from '../../../core/errors/AppError'
 import { computeDeadlineStatus } from '../../deadlines/utils/deadline-status'
 
 
@@ -88,8 +88,8 @@ export const documentService = {
         await storageService.deleteFile(fileUrl).catch(() => {})
       }
 
-      console.error('FULL ERROR =>', error)
-      throw error    }
+      throw error    
+    }
   },
 
   async getUserDocuments(userId: string) {
@@ -115,7 +115,7 @@ export const documentService = {
     const document = await prisma.document.findFirst({
       where: { id, userId },
     })
-    if (!document) throw new Error('Document introuvable')
+    if (!document) throw new AppError('Document introuvable', 404)
     return document
   },
 
@@ -123,7 +123,7 @@ export const documentService = {
     const document = await prisma.document.findFirst({
       where: { id, userId },
     })
-    if (!document) throw new Error('Document introuvable')
+    if (!document) throw new AppError('Document introuvable', 404)
     await storageService.deleteFile(document.fileUrl)
     await prisma.document.delete({ where: { id } })
   },

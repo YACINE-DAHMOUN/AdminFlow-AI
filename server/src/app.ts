@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser'
 import documentRoutes from './modules/documents/routes/document.routes'
 import deadlineRoutes from './modules/deadlines/routes/deadline.routes'
 import { apiLimiter } from '../src/core/middlewares/rateLimit.middleware'
+import { errorHandler } from './core/middlewares/error.middleware'
 
 // Routes
 import authRoutes from './modules/auth/routes/auth.routes'
@@ -48,3 +49,4 @@ app.use((req, res) => {
 
 
 export default app
+app.use(errorHandler)

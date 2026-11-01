@@ -4,6 +4,8 @@ import { prisma } from '../../../core/config/prisma'
 import { config } from '../../../core/config'
 import type { RegisterInput, LoginInput } from '../validators/auth.validators'
 import type { JwtPayload, AuthResponse } from '../../../types/auth.types'
+import { AppError } from '../../../core/errors/AppError'
+
 
 export class AuthService {
 
@@ -14,7 +16,7 @@ export class AuthService {
     })
 
     if (existingUser) {
-      throw new Error('Un compte avec cet email existe déjà')
+      throw new AppError('Email déjà utilisé', 409)
     }
 
     // Hacher le mot de passe
@@ -62,14 +64,14 @@ export class AuthService {
     })
 
     if (!user) {
-      throw new Error('Email ou mot de passe incorrect')
+      throw new AppError('Email ou mot de passe incorrect', 401)
     }
 
     // Vérifier le mot de passe
     const isPasswordValid = await bcrypt.compare(data.password, user.password)
 
     if (!isPasswordValid) {
-      throw new Error('Email ou mot de passe incorrect')
+      throw new AppError('Email ou mot de passe incorrect', 401)
     }
 
     // Générer le token JWT
@@ -112,7 +114,7 @@ export class AuthService {
     })
 
     if (!user) {
-      throw new Error('Utilisateur introuvable')
+      throw new AppError('Utilisateur introuvable', 404)
     }
 
     return user

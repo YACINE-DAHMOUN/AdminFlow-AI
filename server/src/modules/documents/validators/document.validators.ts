@@ -1,4 +1,6 @@
 import multer from 'multer'
+import { AppError } from '../../../core/errors/AppError'
+
 
 // Types de fichiers autorisés
 const ALLOWED_MIME_TYPES = [
@@ -23,8 +25,9 @@ export const upload = multer({
       callback(null, true)
     } else {
       callback(
-        new Error(
-          'Format non supporté. Fichiers acceptés : PDF, JPEG, PNG, WEBP'
+        new AppError(
+          'Format non supporté. Fichiers acceptés : PDF, JPEG, PNG, WEBP',
+          400
         )
       )
     }
