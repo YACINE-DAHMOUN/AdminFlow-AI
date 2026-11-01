@@ -1,6 +1,7 @@
 import { prisma } from '../../../core/config/prisma'
 import type { CreateDeadlineDto, UpdateDeadlineDto } from '../validators/deadline.validators'
 import { computeDeadlineStatus } from '../utils/deadline-status'
+import { AppError } from '../../../core/errors/AppError'
 
 export const deadlineService = {
 
@@ -15,7 +16,7 @@ export const deadlineService = {
         const deadline = await prisma.deadline.findFirst({
             where: { id, userId },
         })
-        if (!deadline) throw new Error('Deadline introuvable')
+        if (!deadline) throw new AppError('Deadline introuvable', 404)
         return deadline
     },
 
@@ -36,7 +37,7 @@ export const deadlineService = {
         const deadline = await prisma.deadline.findFirst({
             where: { id, userId },
         })
-        if (!deadline) throw new Error('Deadline introuvable')
+        if (!deadline) throw new AppError('Deadline introuvable', 404)
         return prisma.deadline.update({
             where: { id },
             data: {
@@ -58,7 +59,7 @@ export const deadlineService = {
         const deadline = await prisma.deadline.findFirst({
             where: { id, userId }
         })
-        if (!deadline) throw new Error('Deadline introuvable')
+        if (!deadline) throw new AppError('Deadline introuvable', 404)
         return prisma.deadline.update({
             where: { id },
             data: { status: 'DONE' },
@@ -70,7 +71,7 @@ export const deadlineService = {
         const deadline = await prisma.deadline.findFirst({
             where: { id, userId },
         })
-        if (!deadline) throw new Error('Deadline introuvable')
+        if (!deadline) throw new AppError('Deadline introuvable', 404)
         return prisma.deadline.delete({ where: { id } })
     }
 }   

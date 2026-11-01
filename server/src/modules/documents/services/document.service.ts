@@ -2,7 +2,7 @@ import { prisma } from '../../../core/config/prisma'
 import { storageService } from '../../../services/storage/storage.service'
 import { ocrService } from '../../../services/ocr/ocr.service'
 import { aiService } from '../../../services/ai/ai.service'
-import type { CreateDocumentDto } from '../../../types/document.types'
+import { AppError } from '../../../core/errors/AppError'
 import { computeDeadlineStatus } from '../../deadlines/utils/deadline-status'
 
 
@@ -58,7 +58,6 @@ export const documentService = {
         documentId,
         extractedText
       )
-        console.log('AI ANALYSIS =>', analysis) 
       // Étape 6 — Créer les échéances détectées automatiquement
       if (analysis.dates && analysis.dates.length > 0) {
         console.log('📅 Création des échéances détectées...')
@@ -89,8 +88,8 @@ export const documentService = {
         await storageService.deleteFile(fileUrl).catch(() => {})
       }
 
-      console.error('FULL ERROR =>', error)
-      throw error    }
+      throw error    
+    }
   },
 
   async getUserDocuments(userId: string) {
@@ -116,7 +115,7 @@ export const documentService = {
     const document = await prisma.document.findFirst({
       where: { id, userId },
     })
-    if (!document) throw new Error('Document introuvable')
+    if (!document) throw new AppError('Document introuvable', 404)
     return document
   },
 
@@ -124,7 +123,7 @@ export const documentService = {
     const document = await prisma.document.findFirst({
       where: { id, userId },
     })
-    if (!document) throw new Error('Document introuvable')
+    if (!document) throw new AppError('Document introuvable', 404)
     await storageService.deleteFile(document.fileUrl)
     await prisma.document.delete({ where: { id } })
   },
@@ -140,6 +139,7 @@ async function createDeadlinesFromAnalysis(
   const deadlineDates = analysis.dates.filter(
     (d: any) => d.type === 'DEADLINE' || d.type === 'FIN'
   )
+     let createdCount = 0
 
   for (const dateInfo of deadlineDates) {
     if (!dateInfo.date || dateInfo.date === 'null') continue
@@ -157,6 +157,7 @@ async function createDeadlinesFromAnalysis(
 
       if (isNaN(dueDate.getTime())) continue
 
+     
       await prisma.deadline.create({
         data: {
           userId,
@@ -167,10 +168,11 @@ async function createDeadlinesFromAnalysis(
           urgency: analysis.urgency || 'LOW',
         },
       })
-
-      console.log(`📅 Échéance créée : ${dateInfo.label} — ${dateInfo.date}`)
+      createdCount++
     } catch {
       console.log(`⚠️ Impossible de créer l'échéance : ${dateInfo.date}`)
     }
   }
+    console.log(`📅 ${createdCount} échéance(s) créée(s)`)   // 3. un seul log, après la boucle
+
 }

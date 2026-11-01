@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express'
+import type { Request, Response, NextFunction } from 'express'
 import { authService } from '../services/auth.service'
 import { registerSchema, loginSchema } from '../validators/auth.validators'
 
@@ -16,7 +16,7 @@ const cookieOptions = {
 
 export class AuthController {
 
-  async register(req: Request, res: Response): Promise<void> {
+  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const validatedData = registerSchema.parse(req.body)
       const result = await authService.register(validatedData)
@@ -33,22 +33,11 @@ export class AuthController {
         },
       })
     } catch (error: any) {
-      if (error.name === 'ZodError') {
-        res.status(400).json({
-          success: false,
-          message: 'Données invalides',
-          errors: error.issues,
-        })
-        return
-      }
-      res.status(400).json({
-        success: false,
-        message: error.message || 'Erreur lors de la création du compte',
-      })
+      next(error)
     }
   }
 
-  async login(req: Request, res: Response): Promise<void> {
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const validatedData = loginSchema.parse(req.body)
       const result = await authService.login(validatedData)
@@ -65,18 +54,7 @@ export class AuthController {
         },
       })
     } catch (error: any) {
-      if (error.name === 'ZodError') {
-        res.status(400).json({
-          success: false,
-          message: 'Données invalides',
-          errors: error.issues,
-        })
-        return
-      }
-      res.status(401).json({
-        success: false,
-        message: error.message || 'Erreur de connexion',
-      })
+      next(error)
     }
   }
 
@@ -95,7 +73,7 @@ export class AuthController {
     })
   }
 
-  async me(req: Request, res: Response): Promise<void> {
+  async me(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = (req as any).user.userId
       const user = await authService.getMe(userId)
@@ -105,12 +83,8 @@ export class AuthController {
         data: user,
       })
     } catch (error: any) {
-      res.status(404).json({
-        success: false,
-        message: error.message || 'Utilisateur introuvable',
-      })
+     next(error)
     }
   }
 }
-
 export const authController = new AuthController()

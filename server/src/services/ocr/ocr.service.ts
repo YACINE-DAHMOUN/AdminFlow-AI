@@ -1,4 +1,6 @@
 import Tesseract from 'tesseract.js'
+import { AppError } from '../../core/errors/AppError'
+
 
 export const ocrService = {
 
@@ -9,6 +11,9 @@ export const ocrService = {
       }
       return await this.extractTextFromImage(fileBuffer)
     } catch (error: any) {
+      // Erreur prévue (AppError) : on la laisse remonter telle quelle jusqu'au filet
+      if (error instanceof AppError) throw error
+      // Erreur technique (pdfjs, Tesseract…) : on l'emballe, elle deviendra un 500 générique
       throw new Error(`Erreur OCR : ${error.message}`)
     }
   },
@@ -33,7 +38,7 @@ export const ocrService = {
     }
 
     if (!fullText.trim() || fullText.trim().length < 10) {
-      throw new Error('Ce PDF ne contient pas de texte extractible (PDF scanné ?)')
+      throw new AppError('Ce PDF ne contient pas de texte extractible (PDF scanné ?)', 422)
     }
 
     return this.cleanText(fullText)
@@ -54,7 +59,7 @@ export const ocrService = {
 
     const text = result.data.text.trim()
     if (!text || text.length < 10) {
-      throw new Error('Impossible d\'extraire le texte de ce document')
+      throw new AppError('Impossible d\'extraire le texte de ce document', 422)
     }
 
     return this.cleanText(text)
