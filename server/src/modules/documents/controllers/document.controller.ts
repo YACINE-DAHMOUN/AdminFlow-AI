@@ -1,20 +1,17 @@
-import type { Response } from 'express'
+import type { Response,NextFunction } from 'express'
 import type { AuthRequest } from '../../../core/middlewares/auth.middleware'
 import { documentService } from '../services/document.service'
+import { AppError } from '../../../core/errors/AppError'
 
 export const documentController = {
 
-  async upload(req: AuthRequest, res: Response): Promise<void> {
+    async upload(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.file) {
-        res.status(400).json({
-          success: false,
-          message: 'Aucun fichier fourni',
-        })
-        return
+        throw new AppError('Aucun fichier fourni', 400)         // ← seul ce bloc a changé
       }
 
-      const userId = req.user!.userId
+      const userId = req.user!.userId                           
       const document = await documentService.uploadAndProcess(req.file, userId)
 
       res.status(201).json({
@@ -22,16 +19,12 @@ export const documentController = {
         message: 'Document uploadé et analysé avec succès',
         data: document,
       })
-    } catch (error: any) {
-      console.error('Error in documentController.upload:', error)
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Erreur lors de l\'upload',
-      })
+    } catch (error) {
+      next(error)
     }
   },
 
-  async getAll(req: AuthRequest, res: Response): Promise<void> {
+  async getAll(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user!.userId
       const documents = await documentService.getUserDocuments(userId)
@@ -41,14 +34,11 @@ export const documentController = {
         data: documents,
       })
     } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Erreur lors de la récupération',
-      })
+     next(error)
     }
   },
 
-  async getById(req: AuthRequest, res: Response): Promise<void> {
+  async getById(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user!.userId
       const { id } = req.params
@@ -59,14 +49,11 @@ export const documentController = {
         data: document,
       })
     } catch (error: any) {
-      res.status(404).json({
-        success: false,
-        message: error.message || 'Document introuvable',
-      })
+     next(error)
     }
   },
 
-  async delete(req: AuthRequest, res: Response): Promise<void> {
+  async delete(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user!.userId
       const { id } = req.params
@@ -77,10 +64,7 @@ export const documentController = {
         message: 'Document supprimé avec succès',
       })
     } catch (error: any) {
-      res.status(404).json({
-        success: false,
-        message: error.message || 'Erreur lors de la suppression',
-      })
+     next(error)
     }
   },
 }
