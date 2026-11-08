@@ -1,10 +1,9 @@
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import { prisma } from '../../../core/config/prisma'
-import { config } from '../../../core/config'
 import type { RegisterInput, LoginInput } from '../validators/auth.validators'
-import type { JwtPayload, AuthResponse } from '../../../types/auth.types'
+import type { AuthResponse } from '../../../types/auth.types'
 import { AppError } from '../../../core/errors/AppError'
+import { createSessionToken } from '../../../core/auth/session'
 
 
 export class AuthService {
@@ -40,7 +39,7 @@ export class AuthService {
     })
 
     // Générer le token JWT
-    const token = this.generateToken({
+    const token = createSessionToken({
      sessionStart: Date.now(),
       userId: user.id,
       email: user.email,
@@ -76,7 +75,7 @@ export class AuthService {
     }
 
     // Générer le token JWT
-    const token = this.generateToken({
+    const token = createSessionToken({
       sessionStart: Date.now(),
       userId: user.id,
       email: user.email,
@@ -122,11 +121,7 @@ export class AuthService {
     return user
   }
 
-  private generateToken(payload: JwtPayload): string {
-    return jwt.sign(payload, config.jwtSecret, {
-      expiresIn: config.session.idleMs / 1000,
-    } as jwt.SignOptions)
-  }
+  
 }
 
 export const authService = new AuthService()

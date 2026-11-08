@@ -2,53 +2,52 @@ import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { config } from '../config'
 import type { JwtPayload } from '../../types/auth.types'
+import { SESSION_COOKIE, createSessionToken, setSessionCookie, clearSessionCookie } from '../auth/session'
 
-export interface AuthRequest extends Request {
-  user?: JwtPayload
+export type AuthRequest = Request   // express.d.ts ajoute déjà user à Request
+
+// Réponse commune quand la session n'est plus valable
+const sessionExpired = (res: Response) => {
+  clearSessionCookie(res)
+  res.status(401).json({
+    success: false,
+    code: 'SESSION_EXPIRED',
+    message: 'Votre session a expiré. Veuillez vous reconnecter.',
+  })
 }
 
-export const authMiddleware = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): void => {
-  try {
-    // Lire le token depuis le cookie httpOnly EN PRIORITÉ
-    // Fallback sur le header Authorization pour les tests API
-    const tokenFromCookie = req.cookies?.adminflow_token
-    const tokenFromHeader = req.headers.authorization?.split(' ')[1]
-    const token = tokenFromCookie || tokenFromHeader
-
-    if (!token) {
-      res.status(401).json({
-        success: false,
-        message: 'Token manquant — authentification requise',
-      })
-      return
-    }
-
-    const decoded = jwt.verify(token, config.jwtSecret) as JwtPayload
-    req.user = decoded
-    next()
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: 'Token invalide ou expiré',
-    })
-  }
-}
-
-export const adminMiddleware = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): void => {
-  if (req.user?.role !== 'ADMIN') {
-    res.status(403).json({
-      success: false,
-      message: 'Accès refusé — droits administrateur requis',
-    })
+export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  const token = req.cookies?.[SESSION_COOKIE]
+  if (!token) {
+    res.status(401).json({ success: false, message: 'Authentification requise' })
     return
   }
+
+  let decoded: JwtPayload
+  try {
+    // Vérifie la signature ET la date d'expiration (15 min sans activité)
+    decoded = jwt.verify(token, config.jwtSecret) as JwtPayload
+  } catch {
+    sessionExpired(res)
+    return
+  }
+
+  // Limite absolue : 8 h depuis la connexion, même si l'utilisateur est actif
+  // (les anciens jetons sans sessionStart sont aussi refusés)
+  if (typeof decoded.sessionStart !== 'number' || Date.now() - decoded.sessionStart > config.session.maxMs) {
+    sessionExpired(res)
+    return
+  }
+
+  // Renouvellement glissant : un nouveau jeton de 15 min, avec le MÊME sessionStart
+  const payload: JwtPayload = {
+    userId: decoded.userId,
+    email: decoded.email,
+    role: decoded.role,
+    sessionStart: decoded.sessionStart,
+  }
+  setSessionCookie(res, createSessionToken(payload))
+
+  req.user = payload
   next()
 }
