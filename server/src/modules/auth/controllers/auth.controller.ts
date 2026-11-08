@@ -1,18 +1,8 @@
 import type { Request, Response, NextFunction } from 'express'
 import { authService } from '../services/auth.service'
 import { registerSchema, loginSchema } from '../validators/auth.validators'
+import { setSessionCookie, clearSessionCookie } from '../../../core/auth/session'
 
-// Durée du cookie — 7 jours en millisecondes
-const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000
-
-// Options du cookie sécurisé
-const cookieOptions = {
-  httpOnly: true,        // Inaccessible par JavaScript
-  secure: process.env.NODE_ENV === 'production', // HTTPS uniquement en prod
-  sameSite: 'lax' as const,  // Protection CSRF
-  maxAge: COOKIE_MAX_AGE,
-  path: '/',
-}
 
 export class AuthController {
 
@@ -22,8 +12,7 @@ export class AuthController {
       const result = await authService.register(validatedData)
 
       // Envoyer le token en cookie httpOnly
-      res.cookie('adminflow_token', result.token, cookieOptions)
-
+      setSessionCookie(res, result.token)
       res.status(201).json({
         success: true,
         message: 'Compte créé avec succès',
@@ -43,8 +32,7 @@ export class AuthController {
       const result = await authService.login(validatedData)
 
       // Envoyer le token en cookie httpOnly
-      res.cookie('adminflow_token', result.token, cookieOptions)
-
+      setSessionCookie(res, result.token)
       res.status(200).json({
         success: true,
         message: 'Connexion réussie',
@@ -59,12 +47,10 @@ export class AuthController {
   }
 
   async logout(req: Request, res: Response): Promise<void> {
-    // Supprimer le cookie en lui donnant une date d'expiration passée
-    res.clearCookie('adminflow_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax' as const,
-      path: '/',
+    clearSessionCookie(res)
+    res.status(200).json({
+      success: true,
+      message: 'Déconnexion réussie',
     })
 
     res.status(200).json({

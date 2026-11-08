@@ -41,6 +41,7 @@ export class AuthService {
 
     // Générer le token JWT
     const token = this.generateToken({
+     sessionStart: Date.now(),
       userId: user.id,
       email: user.email,
       role: user.role,
@@ -76,6 +77,7 @@ export class AuthService {
 
     // Générer le token JWT
     const token = this.generateToken({
+      sessionStart: Date.now(),
       userId: user.id,
       email: user.email,
       role: user.role,
@@ -122,7 +124,7 @@ export class AuthService {
 
   private generateToken(payload: JwtPayload): string {
     return jwt.sign(payload, config.jwtSecret, {
-      expiresIn: config.jwtExpiresIn,
+      expiresIn: config.session.idleMs / 1000,
     } as jwt.SignOptions)
   }
 }
