@@ -59,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (data: RegisterDto) => {
     const result = await authService.register(data)
+    setSessionExpired(false)
     setUser(result.user)
   }, [])
 

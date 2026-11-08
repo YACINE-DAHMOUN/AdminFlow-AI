@@ -31,7 +31,7 @@ export default function LoginPage() {
    // on l'envoie vers le tableau de bord.
    useEffect(() => {
      if (isAuthenticated) navigate({ to: '/dashboard', replace: true })
-   }, [isAuthenticated, navigate])!
+   }, [isAuthenticated, navigate])
 
   const onSubmit = async (data: LoginForm) => {
     try {
