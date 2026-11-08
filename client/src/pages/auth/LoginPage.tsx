@@ -14,7 +14,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const { login } = useAuth()
+  const { login, isAuthenticated, sessionExpired } = useAuth()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError] = useState('')
@@ -26,7 +26,6 @@ export default function LoginPage() {
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   })
-  const { isAuthenticated } = useAuth()
 
      // Dès que l'utilisateur est connecté (après login, ou s'il arrive ici déjà connecté),
    // on l'envoie vers le tableau de bord.
@@ -72,15 +71,30 @@ export default function LoginPage() {
         {/* Carte formulaire */}
         <main
           id="main-content"
-          className="bg-card rounded-xl border border-border-border shadow-sm p-8"
+          className="bg-card rounded-xl border border-border shadow-sm p-8"
         >
+          {/*Session expiree*/}
+          {sessionExpired && (
+            <div
+              role="status"
+              className="flex items-start gap-3 p-4 mb-6 bg-primay/10 border border-primary/20 rounded-lg"
+            >
+              <AlertCircle
+                className="w-5 h-5 text-primary mt-0.5 shrink-0"
+                aria-hidden="true"
+              />
+              <p className="text-sm text-primary font-medium">
+                Votre session a expiré pour votre sécurité. Reconnecter-vous pour continuer.
+              </p>
+            </div>
+          )}
 
           {/* Erreur serveur */}
           {serverError && (
             <div
               role="alert"
               aria-live="polite"
-              className="flex items-start gap-3 p-4 mb-6 bg-destructive/10 border-border-destructive/20 rounded-lg"
+              className="flex items-start gap-3 p-4 mb-6 bg-destructive/10 border border-destructive/20 rounded-lg"
             >
               <AlertCircle
                 className="w-5 h-5 text-destructive mt-0.5 shrink-0"

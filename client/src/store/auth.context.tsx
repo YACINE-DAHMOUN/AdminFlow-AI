@@ -8,6 +8,7 @@ import {
 } from 'react'
 import { authService } from '../services/auth.service'
 import type { User, LoginDto, RegisterDto } from '../types/auth.types'
+import {setSessionExpiredHandler} from '../services/api'
 
 interface AuthContextType {
   user: User | null
@@ -17,6 +18,7 @@ interface AuthContextType {
   register: (data: RegisterDto) => Promise<void>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
+  sessionExpired: boolean
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -24,6 +26,7 @@ const AuthContext = createContext<AuthContextType | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [sessionExpired, setSessionExpired] = useState(false) 
 
   useEffect(() => {
     const initAuth = async () => {
@@ -39,9 +42,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initAuth()
   }, [])
 
+   useEffect(() => {
+    setSessionExpiredHandler(() => {
+      setUser(null)            // → ProtectedRoute redirige vers /login
+      setSessionExpired(true)  // → LoginPage affichera le message
+    })
+
+    return () => setSessionExpiredHandler(null)   // nettoyage
+  }, [])
+
   const login = useCallback(async (data: LoginDto) => {
     const result = await authService.login(data)
     setUser(result.user)
+    setSessionExpired(false)
   }, [])
 
   const register = useCallback(async (data: RegisterDto) => {
@@ -65,6 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated: !!user,
         isLoading,
+        sessionExpired,
         login,
         register,
         logout,
