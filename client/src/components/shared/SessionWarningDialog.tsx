@@ -41,7 +41,7 @@ export function SessionWarningDialog({ open, remainingMs, onStay, onLogout }: Se
         event.preventDefault()   // empêche le navigateur de fermer tout seul
         onStay()
       }}
-      className="w-[calc(100%-2rem)] max-w-md rounded-xl border border-border bg-card p-6 text-foreground shadow-lg backdrop:bg-foreground/40"
+      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl border border-border bg-card p-6 text-foreground shadow-lg backdrop:bg-foreground/40"
     >
       <div className="flex items-start gap-3">
         <Clock className="mt-0.5 size-6 shrink-0 text-primary" aria-hidden="true" />

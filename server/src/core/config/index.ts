@@ -34,7 +34,7 @@ export const config = {
   nodeEnv: env.NODE_ENV,
   jwtSecret: env.JWT_SECRET,
 session: {
-    idleMs: 15 * 60 * 1000,      // 15 min sans activité → déconnexion
+    idleMs: 2 * 60 * 1000,      // 15 min sans activité → déconnexion
     maxMs: 8 * 60 * 60 * 1000,   // 8 h maximum après la connexion, même avec de l'activité
   },  supabase: {
     url: env.SUPABASE_URL,

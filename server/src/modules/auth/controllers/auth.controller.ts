@@ -52,11 +52,6 @@ export class AuthController {
       success: true,
       message: 'Déconnexion réussie',
     })
-
-    res.status(200).json({
-      success: true,
-      message: 'Déconnexion réussie',
-    })
   }
 
   async me(req: Request, res: Response, next: NextFunction): Promise<void> {

@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { setServerActivityHandler } from '../services/api'
 
 // ⚠️ Doit correspondre au serveur : server/src/core/config/index.ts → session.idleMs
-const SESSION_MS = 15 * 60 * 1000
-const WARNING_MS = 2 * 60 * 1000     // on prévient 2 minutes avant
+const SESSION_MS = 2 * 60 * 1000
+const WARNING_MS = 1                       * 60 * 1000     // on prévient 2 minutes avant
 
 export function useSessionTimer(onExpire: () => void) {
   const [lastActivity, setLastActivity] = useState(() => Date.now())
