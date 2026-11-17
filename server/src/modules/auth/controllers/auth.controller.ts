@@ -54,9 +54,24 @@ export class AuthController {
     })
   }
 
+  async logoutAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+const userId = req.user!.userId
+      await authService.logoutAll(userId)
+
+      clearSessionCookie(res)
+      res.status(200).json({
+        success: true,
+        message: 'Déconnecté de tous les appareils',
+      })
+    } catch (error: any) {
+      next(error)
+    }
+  }
+
   async me(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = (req as any).user.userId
+      const userId = req.user!.userId
       const user = await authService.getMe(userId)
 
       res.status(200).json({

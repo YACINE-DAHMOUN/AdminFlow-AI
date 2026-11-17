@@ -13,6 +13,7 @@ export interface JwtPayload {
   email: string
   role: string
   sessionStart: number
+  tokenVersion: number
 }
 
 export interface AuthResponse {

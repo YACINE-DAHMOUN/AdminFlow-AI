@@ -20,6 +20,7 @@ model User {
   documents    Document[]
   integrations Integration[]
   profile      Profile?
+  tokenVersion Int           @map("token_version") @default(0)
 
   @@map("users")
 }

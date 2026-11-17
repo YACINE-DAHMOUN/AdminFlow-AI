@@ -35,6 +35,7 @@ export class AuthService {
         email: true,
         role: true,
         plan: true,
+        tokenVersion: true,
       }
     })
 
@@ -44,6 +45,7 @@ export class AuthService {
       userId: user.id,
       email: user.email,
       role: user.role,
+      tokenVersion: user.tokenVersion,
     })
 
     return {
@@ -80,6 +82,7 @@ export class AuthService {
       userId: user.id,
       email: user.email,
       role: user.role,
+      tokenVersion: user.tokenVersion,
     })
 
     return {
@@ -91,6 +94,14 @@ export class AuthService {
       },
       token,
     }
+  }
+
+  async logoutAll(userId: string): Promise<void> {
+    // Incrémente le tokenVersion pour invalider tous les tokens existants
+    await prisma.user.update({
+      where: { id: userId },
+      data: { tokenVersion: { increment: 1 } },
+    })
   }
 
   async getMe(userId: string) {
