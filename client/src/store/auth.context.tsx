@@ -9,6 +9,7 @@ import {
 import { authService } from "../services/auth.service";
 import type { User, LoginDto, RegisterDto } from "../types/auth.types";
 import { setSessionExpiredHandler } from "../services/api";
+import { broadcastSession, onSessionMessage } from "../services/sessionChannel";
 
 interface AuthContextType {
   user: User | null;
@@ -31,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const expireSession = useCallback(() => {
     setUser(null);
     setSessionExpired(true);
+    broadcastSession({ type: "expired" });
   }, []);
 
   useEffect(() => {
@@ -52,21 +54,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => setSessionExpiredHandler(null);
   }, [expireSession]); // ← la dépendance
 
+  useEffect(() => {
+    return onSessionMessage((message) => {
+      if (message.type === "logout") {
+        setUser(null);
+        setSessionExpired(false);
+      }
+      if (message.type === "expired") {
+        setUser(null);
+        setSessionExpired(true);
+      }
+      if (message.type === "login") {
+        setSessionExpired(false);
+        authService.getMe().then(setUser).catch(() => {
+          setUser(null);
+        });
+      }
+    });
+  }, []);
+
+
   const login = useCallback(async (data: LoginDto) => {
     const result = await authService.login(data);
     setUser(result.user);
     setSessionExpired(false);
+    broadcastSession({ type: 'login' });
   }, []);
 
+  
   const register = useCallback(async (data: RegisterDto) => {
     const result = await authService.register(data);
     setSessionExpired(false);
     setUser(result.user);
+    broadcastSession({ type: 'login' });
+
   }, []);
 
   const logout = useCallback(async () => {
     await authService.logout();
     setUser(null);
+    broadcastSession({ type: 'logout' });
   }, []);
 
   const refreshUser = useCallback(async () => {
