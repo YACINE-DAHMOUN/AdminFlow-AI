@@ -1,10 +1,9 @@
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import { prisma } from '../../../core/config/prisma'
-import { config } from '../../../core/config'
 import type { RegisterInput, LoginInput } from '../validators/auth.validators'
-import type { JwtPayload, AuthResponse } from '../../../types/auth.types'
+import type { AuthResponse } from '../../../types/auth.types'
 import { AppError } from '../../../core/errors/AppError'
+import { createSessionToken } from '../../../core/auth/session'
 
 
 export class AuthService {
@@ -36,14 +35,17 @@ export class AuthService {
         email: true,
         role: true,
         plan: true,
+        tokenVersion: true,
       }
     })
 
     // Générer le token JWT
-    const token = this.generateToken({
+    const token = createSessionToken({
+     sessionStart: Date.now(),
       userId: user.id,
       email: user.email,
       role: user.role,
+      tokenVersion: user.tokenVersion,
     })
 
     return {
@@ -75,10 +77,12 @@ export class AuthService {
     }
 
     // Générer le token JWT
-    const token = this.generateToken({
+    const token = createSessionToken({
+      sessionStart: Date.now(),
       userId: user.id,
       email: user.email,
       role: user.role,
+      tokenVersion: user.tokenVersion,
     })
 
     return {
@@ -90,6 +94,14 @@ export class AuthService {
       },
       token,
     }
+  }
+
+  async logoutAll(userId: string): Promise<void> {
+    // Incrémente le tokenVersion pour invalider tous les tokens existants
+    await prisma.user.update({
+      where: { id: userId },
+      data: { tokenVersion: { increment: 1 } },
+    })
   }
 
   async getMe(userId: string) {
@@ -120,11 +132,7 @@ export class AuthService {
     return user
   }
 
-  private generateToken(payload: JwtPayload): string {
-    return jwt.sign(payload, config.jwtSecret, {
-      expiresIn: config.jwtExpiresIn,
-    } as jwt.SignOptions)
-  }
+  
 }
 
 export const authService = new AuthService()

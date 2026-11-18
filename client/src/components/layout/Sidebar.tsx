@@ -1,13 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { LayoutDashboard, FileText, Upload, CalendarClock, Sparkles, X } from 'lucide-react'
-
+import { LayoutDashboard, FileText, Upload, CalendarClock, UserCog, Sparkles, X } from 'lucide-react'
 const navItems = [
   { to: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { to: '/documents', label: 'Mes documents', icon: FileText },
   { to: '/upload', label: 'Analyser', icon: Upload },
   { to: '/deadlines', label: 'Échéances', icon: CalendarClock },
-] as const
+  { to: '/account', label: 'Mon compte', icon: UserCog },] as const
 
 interface SidebarProps {
   isOpen: boolean // tiroir ouvert (mobile uniquement)
@@ -17,6 +16,7 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { location } = useRouterState()
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  
 
   // À l'ouverture du tiroir, le focus va sur « Fermer le menu »
   useEffect(() => {

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Outlet, useRouterState } from '@tanstack/react-router'
 import Sidebar from './Sidebar'
 import Header from './Header'
+import SessionGuard from './SessionGuard'
 
 export default function MainLayout() {
   const [isNavOpen, setIsNavOpen] = useState(false)
@@ -92,6 +93,7 @@ export default function MainLayout() {
           <Outlet />
         </main>
       </div>
+      <SessionGuard />
     </div>
   )
 }

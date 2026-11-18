@@ -10,6 +10,7 @@ const router = Router()
 router.post('/register',registerLimiter, (req, res, next) => authController.register(req, res, next))
 router.post('/login',loginLimiter, (req, res, next) => authController.login(req, res, next))
 router.post('/logout', (req, res) => authController.logout(req, res))
+router.post('/logout-all', authMiddleware, (req, res, next) => authController.logoutAll(req, res, next))
 
 // Routes protégées — nécessite un token JWT valide
 router.get('/me', authMiddleware, (req, res, next) => authController.me(req, res, next))

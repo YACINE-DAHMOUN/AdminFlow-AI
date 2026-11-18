@@ -23,6 +23,10 @@ export const authService = {
     await api.post('/api/auth/logout')
   },
 
+  async logoutAll(): Promise<void> {
+    await api.post('/api/auth/logout-all')
+  },
+
   async getMe(): Promise<User> {
     const response = await api.get<{ success: boolean; data: User }>(
       '/api/auth/me'
