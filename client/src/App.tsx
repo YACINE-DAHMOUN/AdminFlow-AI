@@ -14,6 +14,7 @@ import UploadPage from './pages/documents/UploadPage'
 import DocumentsPage from './pages/documents/DocumentsPage'
 import DeadlinesPage from './pages/deadlines/DeadlinesPage'
 import MainLayout from './components/layout/MainLayout'
+import AccountPage from './pages/account/AccountPage'
 
 function RootLayout() {
   return <Outlet />
@@ -62,6 +63,8 @@ const protectedLayout = createRoute({
   component: AuthLayout,
 })
 
+
+
 const dashboardRoute = createRoute({
   getParentRoute: () => protectedLayout,
   path: '/dashboard',
@@ -84,6 +87,11 @@ const deadlinesRoute = createRoute({
   path: '/deadlines',
   component: DeadlinesPage,
 })
+const accountRoute = createRoute({
+  getParentRoute: () => protectedLayout,
+  path: '/account',
+  component: AccountPage,
+})
 // ─── ROUTER — construit APRÈS toutes les routes ───────
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -94,6 +102,7 @@ const routeTree = rootRoute.addChildren([
     uploadRoute,
     documentsRoute,
     deadlinesRoute,
+    accountRoute,
   ]),
 ])
 

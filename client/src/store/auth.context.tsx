@@ -19,6 +19,7 @@ interface AuthContextType {
   login: (data: LoginDto) => Promise<void>;
   register: (data: RegisterDto) => Promise<void>;
   logout: () => Promise<void>;
+  logoutAll: () => Promise<void>;
   refreshUser: () => Promise<void>;
   expireSession: () => void;
 }
@@ -96,6 +97,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     broadcastSession({ type: 'logout' });
   }, []);
 
+  const logoutAll = useCallback(async () => {
+    await authService.logoutAll();
+    setUser(null);
+    broadcastSession({ type: 'logout' });
+  }, []);
+
   const refreshUser = useCallback(async () => {
     const currentUser = await authService.getMe();
     setUser(currentUser);
@@ -111,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
+        logoutAll,
         refreshUser,
         expireSession,
       }}

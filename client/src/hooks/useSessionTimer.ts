@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { setServerActivityHandler } from '../services/api'
-import { broadcastSession, onSessionMessage } from '../services/sessionChannel' 
+import { broadcastSession, onSessionMessage } from '../services/sessionChannel'
 
 const SESSION_MS = 15 * 60 * 1000
 const WARNING_MS = 2 * 60 * 1000
@@ -9,14 +9,14 @@ export function useSessionTimer(onExpire: () => void) {
   const [lastActivity, setLastActivity] = useState(() => Date.now())
   const [now, setNow] = useState(() => Date.now())
 
-  
+
   useEffect(() => {
     setServerActivityHandler(() => {
       const at = Date.now()
       setLastActivity(at)
       broadcastSession({ type: 'activity', at })
-      
-    
+
+
     })
     return () => setServerActivityHandler(null)
   }, [])
