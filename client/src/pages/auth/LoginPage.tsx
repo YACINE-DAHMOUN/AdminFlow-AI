@@ -59,7 +59,7 @@ export default function LoginPage() {
         {/* Logo + Titre */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center size-12 rounded-xl bg-sidebar-primary mb-4" aria-hidden="true">
-                <LogoMark alt="" className="size-6 text-sidebar-primary-foreground" />
+                <LogoMark alt="" className="size-12" />
           </div>
           <h1 className="text-2xl font-semibold text-foreground font-heading">
             Connexion

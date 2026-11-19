@@ -48,7 +48,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div className="flex items-center justify-between gap-2 px-5 pt-6 pb-8">
         <div className="flex items-center gap-2.5">
           <div className="size-9 rounded-lg bg-sidebar-primary flex items-center justify-center shrink-0">
-            <LogoMark alt="Logo Plidéa" aria-hidden="true" />
+            <LogoMark />
           </div>
           <div>
             <p className="text-sm font-semibold leading-tight" style={{ fontFamily: '"Bricolage Grotesque", sans-serif' }}>
