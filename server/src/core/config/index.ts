@@ -9,7 +9,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3001),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET doit faire au moins 32 caractères'),
   SUPABASE_SERVICE_KEY: z.string().min(1, 'SUPABASE_SERVICE_KEY est requis'),
-
+  RESEND_API_KEY: z.string().startsWith('re_', 'RESEND_API_KEY doit commencer par re_'),
   SUPABASE_URL: z.url('SUPABASE_URL doit être une URL valide'),
   DATABASE_URL: z.url('DATABASE_URL est requise'),
 })
@@ -33,14 +33,17 @@ export const config = {
   port: env.PORT,
   nodeEnv: env.NODE_ENV,
   jwtSecret: env.JWT_SECRET,
-session: {
+  session: {
     idleMs: 15 * 60 * 1000,      // 15 min sans activité → déconnexion
     maxMs: 8 * 60 * 60 * 1000,   // 8 h maximum après la connexion, même avec de l'activité
-  },  supabase: {
+  }, supabase: {
     url: env.SUPABASE_URL,
     serviceKey: env.SUPABASE_SERVICE_KEY,
   },
   database: {
     url: env.DATABASE_URL,
+  },
+  email: {
+    resendApiKey: env.RESEND_API_KEY,
   },
 }
