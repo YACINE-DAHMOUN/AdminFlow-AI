@@ -9,6 +9,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3001),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET doit faire au moins 32 caractères'),
   SUPABASE_SERVICE_KEY: z.string().min(1, 'SUPABASE_SERVICE_KEY est requis'),
+  EMAIL_FROM: z.string().min(1).default('Plidéa <no-reply@plidea.fr>'),
+  APP_URL: z.url('APP_URL doit être une URL valide (adresse du front)'),
   RESEND_API_KEY: z.string().startsWith('re_', 'RESEND_API_KEY doit commencer par re_'),
   SUPABASE_URL: z.url('SUPABASE_URL doit être une URL valide'),
   DATABASE_URL: z.url('DATABASE_URL est requise'),
@@ -43,7 +45,9 @@ export const config = {
   database: {
     url: env.DATABASE_URL,
   },
+  appUrl: env.APP_URL,
   email: {
     resendApiKey: env.RESEND_API_KEY,
+    from: env.EMAIL_FROM,
   },
 }
