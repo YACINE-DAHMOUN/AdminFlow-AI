@@ -7,7 +7,7 @@ export type SessionMessage =
 
 // Le canal (null si le navigateur ne connaît pas BroadcastChannel : on se passe alors de la synchro)
 const channel = typeof BroadcastChannel !== 'undefined'
-  ? new BroadcastChannel('adminflow-session')
+  ? new BroadcastChannel('plidea-session')
   : null
 
 // Envoyer un message aux AUTRES onglets
