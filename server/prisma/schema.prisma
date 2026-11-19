@@ -20,6 +20,7 @@ model User {
   documents    Document[]
   integrations Integration[]
   authTokens   AuthToken[]
+  emailVerifiedAt DateTime?  @map("email_verified_at")
   profile      Profile?
   tokenVersion Int           @map("token_version") @default(0)
 
