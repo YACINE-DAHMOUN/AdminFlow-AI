@@ -1,9 +1,9 @@
-AdminFlow AI
+Plidéa
 
 L'IA qui simplifie la bureaucratie française 🇫🇷
 
 Présentation
-AdminFlow AI est une application SaaS qui aide les auto-entrepreneurs, TPE/PME et particuliers français à gérer leur administratif quotidien grâce à l'intelligence artificielle.
+Plidéa est une application SaaS qui aide les auto-entrepreneurs, TPE/PME et particuliers français à gérer leur administratif quotidien grâce à l'intelligence artificielle.
 Fonctionnalités principales
 
 📄 Analyse automatique de documents administratifs (OCR + IA)
@@ -21,7 +21,7 @@ Backend
 TechnologieVersionRôleNode.js22Runtime JavaScriptExpress4Framework HTTPTypeScript5Typage statiquePrisma5ORM PostgreSQLSupabase2Auth + DB + StorageTesseract.js5OCR documentsOllama + Llama 3localAnalyse IA locale et gratuiteJWT + bcryptjs-Authentification sécuriséeZod3Validation des données entrantescookie-parser1.4Lecture des cookies httpOnly
 
 Structure du projet
-AdminFlow-AI/
+Plidéa/
 ├── client/                             # Application React (port 5173)
 │   ├── src/
 │   │   ├── components/
@@ -107,7 +107,7 @@ Authentification — /api/auth
 MéthodeRouteAccèsDescriptionGET/healthPublicVérification que le serveur tournePOST/api/auth/registerPublicCréer un compte — définit le cookie httpOnlyPOST/api/auth/loginPublicSe connecter — définit le cookie httpOnlyPOST/api/auth/logoutPublicSe déconnecter — supprime le cookieGET/api/auth/me🔒 Cookie JWTRécupérer l'utilisateur connecté
 Sécurité des cookies
 Le token JWT est stocké dans un cookie httpOnly — inaccessible à JavaScript :
-Cookie: adminflow_token=eyJhbGci...
+Cookie: Plidéa_token=eyJhbGci...
   httpOnly: true     ← JavaScript ne peut pas lire ce cookie
   secure: true       ← HTTPS uniquement en production
   sameSite: lax      ← Protection CSRF
@@ -134,8 +134,8 @@ Compte Supabase gratuit — supabase.com
 
 Étapes d'installation
 bash# 1. Cloner le projet
-git clone https://github.com/TON_USER/AdminFlow-AI.git
-cd AdminFlow-AI
+git clone https://github.com/TON_USER/Plidéa.git
+cd Plidéa
 
 # 2. Installer les dépendances frontend
 cd client && npm install
@@ -175,12 +175,12 @@ Les valeurs se trouvent dans Supabase → Settings → API et Settings → Datab
 Vérification
 bash# Backend opérationnel
 curl http://localhost:3001/health
-# → { "status": "OK", "app": "AdminFlow AI", "version": "1.0.0" }
+# → { "status": "OK", "app": "Plidea", "version": "1.0.0" }
 
 # Test inscription (Git Bash)
 curl -X POST http://localhost:3001/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@adminflow.fr","password":"AdminFlow@2026"}'
+  -d '{"email":"plidea@Plidea.fr","password":"plidea@2026"}'
 Politique de mot de passe
 Pour la sécurité des données administratives confidentielles :
 ✓ 12 caractères minimum

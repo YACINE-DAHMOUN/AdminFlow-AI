@@ -3,8 +3,9 @@ import { useNavigate, Link } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { AlertCircle, Eye, EyeOff, Sparkles, Loader2, CheckCircle2 } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../../store/auth.context'
+import { LogoMark } from '../../components/shared/LogoMark'
 
 const registerSchema = z.object({
   email: z
@@ -144,7 +145,7 @@ export default function RegisterPage() {
         {/* Logo + Titre */}
         <div className="text-center mb-8">
          <div className="inline-flex items-center justify-center size-12 rounded-xl bg-sidebar-primary mb-4" aria-hidden="true">
-                <Sparkles className="size-6 text-sidebar-primary-foreground" />
+                <LogoMark alt="" className="size-6 text-sidebar-primary-foreground" />
           </div>
           <h1 className="text-2xl font-semibold text-foreground font-heading">
             Créer un compte

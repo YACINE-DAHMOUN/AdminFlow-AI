@@ -2,7 +2,7 @@ import type { CookieOptions, Response } from 'express'
 import { config } from '../config'
 import { JwtPayload } from '../../types/auth.types'
 import jwt from 'jsonwebtoken'
-export const SESSION_COOKIE = 'adminflow_token'
+export const SESSION_COOKIE = 'plidea_token'
 
 // Options communes : les mêmes pour poser et pour effacer le cookie
 const baseOptions: CookieOptions = {

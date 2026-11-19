@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { LayoutDashboard, FileText, Upload, CalendarClock, UserCog, Sparkles, X } from 'lucide-react'
+import { LayoutDashboard, FileText, Upload, CalendarClock, UserCog, X } from 'lucide-react'
+import { LogoMark } from '../shared/LogoMark'
 const navItems = [
   { to: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { to: '/documents', label: 'Mes documents', icon: FileText },
@@ -47,11 +48,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div className="flex items-center justify-between gap-2 px-5 pt-6 pb-8">
         <div className="flex items-center gap-2.5">
           <div className="size-9 rounded-lg bg-sidebar-primary flex items-center justify-center shrink-0">
-            <Sparkles className="size-4 text-sidebar-primary-foreground" aria-hidden="true" />
+            <LogoMark alt="Logo Plidéa" aria-hidden="true" />
           </div>
           <div>
             <p className="text-sm font-semibold leading-tight" style={{ fontFamily: '"Bricolage Grotesque", sans-serif' }}>
-              AdminFlow <span className="text-sidebar-primary">AI</span>
+              Plid<span className="text-sidebar-primary">é</span>a
             </p>
             <p className="text-[11px] text-sidebar-muted leading-tight mt-0.5">
               L'IA administrative

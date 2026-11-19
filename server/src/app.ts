@@ -29,7 +29,7 @@ app.use(cookieParser())  // Parse les cookies de chaque requête
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', app: 'AdminFlow AI', version: '1.0.0' })
+  res.json({ status: 'OK', app: 'Plidéa', version: '1.0.0' })
 })
 
 // Routes API
