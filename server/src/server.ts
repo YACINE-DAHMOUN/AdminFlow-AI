@@ -7,7 +7,7 @@ import { startDeadlinesCron, updateDeadlineStatuses } from './core/cron/deadline
 const PORT = process.env.PORT || 3001
 
 app.listen(PORT, () => {
-  console.log(`🚀 plidéa Server running on port ${PORT}`)
+  console.log(`🚀 Plidéa Server running on port ${PORT}`)
 
   // Mise à jour immédiate au démarrage : pas besoin d'attendre 2h du matin
   updateDeadlineStatuses().catch((error) =>
