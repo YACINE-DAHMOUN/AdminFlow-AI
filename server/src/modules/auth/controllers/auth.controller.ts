@@ -7,24 +7,19 @@ import { setSessionCookie, clearSessionCookie } from '../../../core/auth/session
 export class AuthController {
 
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const validatedData = registerSchema.parse(req.body)
-      const result = await authService.register(validatedData)
+  try {
+    const validatedData = registerSchema.parse(req.body)
+    await authService.register(validatedData)
 
-      // Envoyer le token en cookie httpOnly
-      setSessionCookie(res, result.token)
-      res.status(201).json({
-        success: true,
-        message: 'Compte créé avec succès',
-        data: {
-          user: result.user
-          // On ne renvoie PLUS le token dans le body
-        },
-      })
-    } catch (error: any) {
-      next(error)
-    }
+    // Même réponse que l'adresse soit nouvelle ou déjà inscrite (anti-énumération)
+    res.status(202).json({
+      success: true,
+      message: 'Si cette adresse peut être utilisée, un email vous a été envoyé.',
+    })
+  } catch (error) {
+    next(error)
   }
+}
 
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
