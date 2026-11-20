@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { authService } from "../services/auth.service";
-import type { User, LoginDto, RegisterDto } from "../types/auth.types";
+import type { User, LoginDto } from "../types/auth.types";
 import { setSessionExpiredHandler } from "../services/api";
 import { broadcastSession, onSessionMessage } from "../services/sessionChannel";
 
@@ -17,7 +17,6 @@ interface AuthContextType {
   isLoading: boolean;
   sessionExpired: boolean;
   login: (data: LoginDto) => Promise<void>;
-  register: (data: RegisterDto) => Promise<void>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -67,40 +66,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       if (message.type === "login") {
         setSessionExpired(false);
-        authService.getMe().then(setUser).catch(() => {
-          setUser(null);
-        });
+        authService
+          .getMe()
+          .then(setUser)
+          .catch(() => {
+            setUser(null);
+          });
       }
     });
   }, []);
-
 
   const login = useCallback(async (data: LoginDto) => {
     const result = await authService.login(data);
     setUser(result.user);
     setSessionExpired(false);
-    broadcastSession({ type: 'login' });
-  }, []);
-
-  
-  const register = useCallback(async (data: RegisterDto) => {
-    const result = await authService.register(data);
-    setSessionExpired(false);
-    setUser(result.user);
-    broadcastSession({ type: 'login' });
-
+    broadcastSession({ type: "login" });
   }, []);
 
   const logout = useCallback(async () => {
     await authService.logout();
     setUser(null);
-    broadcastSession({ type: 'logout' });
+    broadcastSession({ type: "logout" });
   }, []);
 
   const logoutAll = useCallback(async () => {
     await authService.logoutAll();
     setUser(null);
-    broadcastSession({ type: 'logout' });
+    broadcastSession({ type: "logout" });
   }, []);
 
   const refreshUser = useCallback(async () => {
@@ -116,7 +108,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         sessionExpired,
         login,
-        register,
         logout,
         logoutAll,
         refreshUser,

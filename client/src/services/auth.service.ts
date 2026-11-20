@@ -3,12 +3,12 @@ import type { AuthResponse, LoginDto, RegisterDto, User } from '../types/auth.ty
 
 export const authService = {
 
-  async register(data: RegisterDto): Promise<{ user: User }> {
-    const response = await api.post<{ success: boolean; data: { user: User } }>(
+  async register(data: RegisterDto): Promise<{ message:string}> {
+    const response = await api.post<{ success: boolean; message: string }>(
       '/api/auth/register',
       data
     )
-    return response.data.data
+    return response.data
   },
 
   async login(data: LoginDto): Promise<{ user: User }> {

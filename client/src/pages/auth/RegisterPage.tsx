@@ -7,6 +7,7 @@ import { AlertCircle, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../../store/auth.context'
 import { LogoMark } from '../../components/shared/LogoMark'
 import { BrandName } from '../../components/shared/BrandName'
+import { authService } from '../../services/auth.service'
 
 const registerSchema = z.object({
   email: z
@@ -99,11 +100,12 @@ function PasswordStrength({ password }: { password: string }) {
 }
 
 export default function RegisterPage() {
-  const { register: registerUser } = useAuth()
+  
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [serverError, setServerError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
 
   const {
     register,
@@ -126,7 +128,8 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     try {
       setServerError('')
-      await registerUser({ email: data.email, password: data.password })
+        const result = await authService.register({email: data.email, password: data.password})
+        setSuccessMessage(result.message)
     } catch (error: any) {
       setServerError(
         error?.response?.data?.message || 'Une erreur est survenue'
@@ -172,7 +175,7 @@ export default function RegisterPage() {
         >
 
           {/* Erreur serveur */}
-          {serverError && (
+          {serverError (
             <div
               role="alert"
               aria-live="polite"
@@ -187,6 +190,16 @@ export default function RegisterPage() {
               </p>
             </div>
           )}
+            {successMessage ? (                                        
+            <div role="status" className="flex items-start gap-3 p-4 mb-6 bg-secondary border-border-secondary rounded-lg">                        
+              <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0"
+                aria-hidden="true" />                                     
+              <div>                                                  
+                <p>{successMessage}</p>                              
+                <p className="text-xs text-secondary-foreground mt-1">Pensez à vérifier vos courriers indésirables, le lien est valable 30 minutes</p> 
+              </div>                                                 
+            </div>                                                   
+          ) : (     
 
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -358,6 +371,7 @@ export default function RegisterPage() {
               )}
             </button>
           </form>
+          )}
         </main>
 
         {/* Lien connexion */}
