@@ -11,6 +11,14 @@ export const authService = {
     return response.data
   },
 
+  async verifyEmail(token: string): Promise<{ message:string}> {
+    const response = await api.post<{ success: boolean; message: string }>(
+      '/api/auth/verify-email',
+      { token }
+    )
+    return response.data
+  },
+
   async login(data: LoginDto): Promise<{ user: User }> {
     const response = await api.post<{ success: boolean; data: { user: User } }>(
       '/api/auth/login',

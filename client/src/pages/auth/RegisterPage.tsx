@@ -175,7 +175,7 @@ export default function RegisterPage() {
         >
 
           {/* Erreur serveur */}
-          {serverError (
+          {serverError && (
             <div
               role="alert"
               aria-live="polite"
@@ -191,11 +191,11 @@ export default function RegisterPage() {
             </div>
           )}
             {successMessage ? (                                        
-            <div role="status" className="flex items-start gap-3 p-4 mb-6 bg-secondary border-border-secondary rounded-lg">                        
+            <div role="status" className="flex items-start gap-3 p-4 mb-6 bg-secondary border border-secondary rounded-lg">                        
               <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0"
                 aria-hidden="true" />                                     
               <div>                                                  
-                <p>{successMessage}</p>                              
+                <p className="text-sm text-secondary-foreground font-medium">{successMessage}</p>                              
                 <p className="text-xs text-secondary-foreground mt-1">Pensez à vérifier vos courriers indésirables, le lien est valable 30 minutes</p> 
               </div>                                                 
             </div>                                                   
