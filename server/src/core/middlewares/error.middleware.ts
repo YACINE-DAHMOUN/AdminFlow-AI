@@ -8,7 +8,7 @@ import { AppError } from '../errors/AppError'
 export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   // 1. Erreur prévue → on renvoie son message et son code
   if (err instanceof AppError) {
-    res.status(err.statusCode).json({ success: false, message: err.message })
+    res.status(err.statusCode).json({ success: false, message: err.message, code : err.code })
     return
   }
 

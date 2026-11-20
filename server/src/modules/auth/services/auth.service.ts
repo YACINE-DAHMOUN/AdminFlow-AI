@@ -89,6 +89,9 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new AppError('Email ou mot de passe incorrect', 401)
     }
+    if (!user.emailVerifiedAt) {
+      throw new AppError('Veuillez vérifier votre adresse email avant de vous connecter.', 403, 'EMAIL_NOT_VERIFIED')
+    }
 
     // Générer le token JWT
     const token = createSessionToken({
