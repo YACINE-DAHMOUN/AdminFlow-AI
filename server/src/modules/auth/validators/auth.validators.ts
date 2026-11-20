@@ -30,6 +30,12 @@ export const emailVerificationSchema = z.object({
   .regex(/^[A-Za-z0-9_-]+$/, 'Ce lien n\'est plus valide. Demandez-en un nouveau.'),
     
 })
+
+export const resendVerificationSchema = z.object({
+  email: z.string().email('Email invalide').toLowerCase(),
+})
+
 export type RegisterInput = z.infer<typeof registerSchema>
 export type LoginInput = z.infer<typeof loginSchema>
 export type EmailVerificationInput = z.infer<typeof emailVerificationSchema>
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>

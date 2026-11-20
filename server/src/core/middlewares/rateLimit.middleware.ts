@@ -47,3 +47,11 @@ export const emailVerificationLimiter = rateLimit({
   standardHeaders: 'draft-8',
   legacyHeaders: false,       // n'envoie pas les vieux en-têtes X-RateLimit-*
 })
+
+export const resendVerificationLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,   // fenêtre de 15 minutes, en millisecondes
+  limit: 3,                   // 3 requêtes maximum par fenêtre
+  message: tooMany('Trop de tentatives. Veuillez réessayer dans quelques minutes.'),
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,       // n'envoie pas les vieux en-têtes X-RateLimit-*
+})

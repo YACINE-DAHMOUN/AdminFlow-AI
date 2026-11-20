@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from 'express'
 import { authService } from '../services/auth.service'
 import { registerSchema, loginSchema } from '../validators/auth.validators'
 import { setSessionCookie, clearSessionCookie } from '../../../core/auth/session'
-import { emailVerificationSchema } from '../validators/auth.validators'
+import { emailVerificationSchema, resendVerificationSchema } from '../validators/auth.validators'
 
 
 export class AuthController {
@@ -30,6 +30,20 @@ async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void
     res.status(200).json({
       success: true,
       message: 'Votre adresse email est confirmée. Vous pouvez vous connecter.',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+async resendVerification(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const validatedData = resendVerificationSchema.parse(req.body)
+    await authService.resendVerification(validatedData.email)
+
+    res.status(202).json({
+      success: true,
+      message: 'Si un compte non confirmé existe pour cette adresse, un nouveau lien vous a été envoyé.',
     })
   } catch (error) {
     next(error)

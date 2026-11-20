@@ -21,6 +21,23 @@ export class AuthService {
       data: { emailVerifiedAt: new Date() },
     })
   }
+  async resendVerification(email: string): Promise<void> {
+  // 1. Chercher le compte
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, emailVerifiedAt: true },
+  })
+
+  // 2. Seul cas utile : le compte existe ET n'est pas encore vérifié
+  if (user && !user.emailVerifiedAt) {
+    // 3. Envoi en arrière-plan (sans await) : même durée de réponse dans tous les cas
+    this.sendVerificationEmail(user.id, email).catch((error) => {
+      console.error(`Renvoi du lien de confirmation échoué : ${error.name}`)
+    })
+  }
+
+  // Adresse inconnue ou déjà vérifiée : on ne fait rien, sans erreur
+}
 
   async register(data: RegisterInput): Promise<void> {
     // 1. Hacher en premier : même durée, que l'adresse existe ou non
