@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { AlertCircle, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../../store/auth.context'
 import { LogoMark } from '../../components/shared/LogoMark'
+import { BrandName } from '../../components/shared/BrandName'
 
 const registerSchema = z.object({
   email: z
@@ -134,7 +135,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-background flex flex-col justify-center py-8">
+    <div className="min-h-screen bg-background flex flex-col justify-center py-8">
 
       <a href="#main-content" className="skip-link">
         Aller au contenu principal
@@ -147,6 +148,7 @@ export default function RegisterPage() {
          <div className="inline-flex items-center justify-center size-12 rounded-xl bg-sidebar-primary mb-4" aria-hidden="true">
                 <LogoMark alt="" className="size-12" />
           </div>
+          <BrandName className="block text-3xl font-bold text-foreground" accentClassName="text-brand-accent-ink" />
           <h1 className="text-2xl font-semibold text-foreground font-heading">
             Créer un compte
           </h1>

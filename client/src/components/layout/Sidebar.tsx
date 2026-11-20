@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { LayoutDashboard, FileText, Upload, CalendarClock, UserCog, X } from 'lucide-react'
 import { LogoMark } from '../shared/LogoMark'
+import { BrandName } from '../shared/BrandName'
 const navItems = [
   { to: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { to: '/documents', label: 'Mes documents', icon: FileText },
@@ -51,9 +52,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <LogoMark />
           </div>
           <div>
-            <p className="text-sm font-semibold leading-tight" style={{ fontFamily: '"Bricolage Grotesque", sans-serif' }}>
-              Plid<span className="text-sidebar-primary">é</span>a
-            </p>
+          <BrandName className="text-lg font-bold text-sidebar-foreground" accentClassName="text-sidebar-primary" />
             <p className="text-[11px] text-sidebar-muted leading-tight mt-0.5">
               L'IA administrative
             </p>

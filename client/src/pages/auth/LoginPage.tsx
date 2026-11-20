@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useAuth } from '../../store/auth.context'
 import { LogoMark } from '../../components/shared/LogoMark'
+import { BrandName } from '../../components/shared/BrandName'
 
 const loginSchema = z.object({
   email: z.string().email('Adresse email invalide'),
@@ -47,7 +48,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-center">
+    <div className="min-h-screen bg-background flex flex-col justify-center py-8">
 
       {/* Skip link accessibilité */}
       <a href="#main-content" className="skip-link">
@@ -61,6 +62,7 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center size-12 rounded-xl bg-sidebar-primary mb-4" aria-hidden="true">
                 <LogoMark alt="" className="size-12" />
           </div>
+          <BrandName className="block text-3xl font-bold text-foreground" accentClassName="text-brand-accent-ink" />
           <h1 className="text-2xl font-semibold text-foreground font-heading">
             Connexion
           </h1>
