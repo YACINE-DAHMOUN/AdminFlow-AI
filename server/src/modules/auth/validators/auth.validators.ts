@@ -24,6 +24,12 @@ export const loginSchema = z.object({
     .string()
     .min(1, 'Le mot de passe est requis'),
 })
-
+export const emailVerificationSchema = z.object({
+  token: z.string()
+  .length(43, 'Ce lien n\'est plus valide. Demandez-en un nouveau.')
+  .regex(/^[A-Za-z0-9_-]+$/, 'Ce lien n\'est plus valide. Demandez-en un nouveau.'),
+    
+})
 export type RegisterInput = z.infer<typeof registerSchema>
 export type LoginInput = z.infer<typeof loginSchema>
+export type EmailVerificationInput = z.infer<typeof emailVerificationSchema>

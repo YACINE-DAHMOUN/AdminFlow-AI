@@ -17,7 +17,7 @@ export const loginLimiter = rateLimit({
     limit : 5,                 // 5 requêtes maximum par fenêtre
     standardHeaders : 'draft-8', // envoie l'en-tête RateLimit au client (bonne pratique)
     legacyHeaders : false,       // n'envoie pas les vieux en-têtes X-RateLimit-*
-    message : tooMany('Trop de tentatives. veuillez réessayez dans quelques minutes.'),
+    message : tooMany('Trop de tentatives. veuillez réessayer dans quelques minutes.'),
     skipSuccessfulRequests: true
 })
 
@@ -27,7 +27,7 @@ export const registerLimiter = rateLimit({
   limit: 5,                 // 5 requêtes maximum par fenêtre
   standardHeaders: 'draft-8', // envoie l'en-tête RateLimit au client (bonne pratique)
   legacyHeaders: false,       // n'envoie pas les vieux en-têtes X-RateLimit-*
-  message: tooMany('Inscription : limite la création massive de comptes.'),
+  message: tooMany('Trop de tentatives d’inscription. Réessayez dans une heure.'),
 })
 
 export const uploadLimiter = rateLimit({
@@ -35,7 +35,15 @@ export const uploadLimiter = rateLimit({
   limit: 20,                  // 20 requêtes maximum par fenêtre
   
  keyGenerator: (req) => req.user?.userId ?? ipKeyGenerator(req.ip ?? ''),
-  message: tooMany('Trop de tentatives. veuillez réessayez dans quelques minutes.'),
+  message: tooMany('Trop de tentatives. veuillez réessayer dans quelques minutes.'),
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,       // n'envoie pas les vieux en-têtes X-RateLimit-*
+})
+
+export const emailVerificationLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,   // fenêtre de 10 minutes, en millisecondes
+  limit: 10,                  // 10 requêtes maximum par fenêtre
+  message: tooMany('Trop de tentatives. veuillez réessayer dans quelques minutes.'),
   standardHeaders: 'draft-8',
   legacyHeaders: false,       // n'envoie pas les vieux en-têtes X-RateLimit-*
 })

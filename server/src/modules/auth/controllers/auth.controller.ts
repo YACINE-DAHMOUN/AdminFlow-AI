@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express'
 import { authService } from '../services/auth.service'
 import { registerSchema, loginSchema } from '../validators/auth.validators'
 import { setSessionCookie, clearSessionCookie } from '../../../core/auth/session'
+import { emailVerificationSchema } from '../validators/auth.validators'
 
 
 export class AuthController {
@@ -15,6 +16,20 @@ export class AuthController {
     res.status(202).json({
       success: true,
       message: 'Si cette adresse peut être utilisée, un email vous a été envoyé.',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const validatedData = emailVerificationSchema.parse(req.body)
+    await authService.verifyEmail(validatedData.token)
+
+    res.status(200).json({
+      success: true,
+      message: 'Votre adresse email est confirmée. Vous pouvez vous connecter.',
     })
   } catch (error) {
     next(error)
